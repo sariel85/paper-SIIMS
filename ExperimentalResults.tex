@@ -1,0 +1,390 @@
+\externaldocument{paper.tex}
+\section{Experimental results} \label{sec:results}
+
+	\subsection{Simulated data}
+	
+	Consider an intrinsic manifold $\mathcal{X}$ corresponding to a 2-dimensions square with a cross shaped hole in its center which makes it non-convex. This latent manifold is observed via the following observation function:
+	\begin{equation} \label{eq:simulated_data_observation_function}
+	\mathbf{y\left(\mathbf{x}\right)}=f\left(\mathbf{x}\right)=\text{\ensuremath{\left[\begin{array}{c}
+			y_{1}\left(\mathbf{x}\right)\\
+			y_{2}\left(\mathbf{x}\right)\\
+			y_{3}\left(\mathbf{x}\right) 
+			\end{array}\right]}=}
+		\left[\begin{array}{c}
+	\sin \left(2.5 \cdot x_1 \right)\cdot \sin \left( x_2 \right)\\
+	\sin \left(2.5 \cdot x_1 \right)\cdot \cos \left( x_2 \right)\\
+	-\sin \left( x_2 \right)
+	\end{array}\right]
+	\end{equation}
+	The observation function embeds the data in 3-dimensional Euclidean space by partially wrapping it on the unit sphere. The resulting observed manifold $\mathcal{Y}=\left\{ f\left(\mathbf{x}\right) \mid \mathbf{x}\in\mathcal{X}\right\}$ has the shape of a severed ball with a cross shaped hole in it. In order to generate the sample subsets $\mathcal{X}_{s}$ and $\mathcal{Y}_{s}$, $N=1000$ points are sampled uniformly with respect to $\mathcal{X}$. 
+	
+	\subsubsection{Intrinsic isometric embedding} \label{ssec:simulated_data_Intrinsic_isometric_embedding}
+	First we evaluate the validity of the intrinsic Euclidean distance estimation presented in \cref{eq:int_dist_approx} and the ability of the embedding method suggested in \cref{sec:Intrinsic-isometric-manifold-learning} to recover the latent geometric structure of the data, given the intrinsic metric over the observed manifold. To do so we analytically calculate $\frac{df}{dx}\left(\mathbf{x}_{i}\right)\frac{df}{dx}\left(\mathbf{x}_{i}\right)^{T}$ by taking the derivative of the observation function given in \cref{eq:simulated_data_observation_function} with respect to the intrinsic latent variable. 
+	
+	The results of applying the suggested intrinsic isometric embedding algorithm on this data set are displayed in \cref{fig:punctured_severed_sphere}. In \cref{fig:punctured_severed_sphere_intrinsic} we present the intrinsic latent manifold in the intrinsic space and in \cref{fig:punctured_severed_sphere_observed} we present the observed manifold embedded in the observation space. In \cref{fig:punctured_severed_sphere_intrinsic_metric} we visualize the exact intrinsic metric (the push-forward metric) by plotting corresponding ellipses at several sample points. These  ellipses represent the images of circles of equal radius in the intrinsic space according to the estimated metric, this visualizes the amount of local stretch and contraction in each direction that the observed manifold experiences with respect to the latent intrinsic manifold . In \cref{fig:punctured_severed_sphere_intrinsic_dist_est} we plot the ground truth intrinsic Euclidean inter-point distances against the approximated inter-point distance using \cref{eq:int_dist_approx}, this results in a scatter plot where the closer a point is to the diagonal red line, the better the distance estimation of the corresponding intrinsic distance between the point pair is. In \cref{fig:punctured_severed_sphere_intrinsic_dist_est_knn} we plot the same distance estimation scatter plot but restrict the point pairs represented to distances to the selected $k$ nearest neighbors, which are the only distances which are taken into account by our suggested algorithm. For the following results we used $k=30$. 
+	
+	In order to compare different manifold learning methods we plot for each method the resulting embedding and a scatter plot which for each point pair, compares the Euclidean distance in the resulting embedding to the true intrinsic Euclidean distance as measured in the intrinsic space. In general a concentration of point along the diagonal line represents a better embedding. In order to provide a single quantitative measure of the quality of the reconstruction , we also calculate for each embedding the Stress (\cref{eq:stress}) of the embedding with respect to the true intrinsic structure. These to graphs are plotted for standard Isomap (\cref{fig:punctured_severed_sphere_standard_isomap_embedding} and \cref{fig:punctured_severed_sphere_standard_isomap_stress}, intrinsic Isomap (\cref{fig:punctured_severed_sphere_standard_isomap_embedding} and \cref{fig:punctured_severed_sphere_intrinsic_isomap_stress}) and finally for our suggested intrinsic-isometric algorithm (\cref{fig:punctured_severed_sphere_intrinsic_isometric_embedding} and \cref{fig:punctured_severed_sphere_intrinsic_isometric_stress}).
+	
+	Similar results on several other synthetic data sets are provided as supplementary material \cref{ssec:Additional-results-manifold-learning}.
+	
+	\begin{figure}[h]	
+		\begin{centering}
+			\begin{subfigure}[b]{0.3\linewidth}
+				\includegraphics[width=1\linewidth]{figures/Chapter_3/cross_punctured_2d_square_severed_sphere/intrinsic}
+				\caption{\label{fig:punctured_severed_sphere_intrinsic}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[b]{0.3\linewidth}
+				\includegraphics[width=1\linewidth]{figures/Chapter_3/cross_punctured_2d_square_severed_sphere/observed}
+				\caption{\label{fig:punctured_severed_sphere_observed}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[b]{0.3\linewidth}
+				\includegraphics[width=1\linewidth]{figures/Chapter_3/cross_punctured_2d_square_severed_sphere/metric_local_dense}
+				\caption{\label{fig:punctured_severed_sphere_intrinsic_metric}}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}
+			\begin{subfigure}[b]{0.45\linewidth}
+				\includegraphics[width=1\linewidth]{figures/Chapter_3/cross_punctured_2d_square_severed_sphere/dist_local_dense}
+				\caption{\label{fig:punctured_severed_sphere_intrinsic_dist_est}}
+			\end{subfigure}
+			\hfill
+			\begin{subfigure}[b]{0.45\linewidth}
+				\includegraphics[width=1\linewidth]{figures/Chapter_3/cross_punctured_2d_square_severed_sphere/dist_local_dense_knn}
+				\caption{\label{fig:punctured_severed_sphere_intrinsic_dist_est_knn}}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}
+			\begin{subfigure}[b]{0.32\linewidth}
+				\includegraphics[width=1\linewidth]{figures/Chapter_3/cross_punctured_2d_square_severed_sphere/standard_isomap_embedding}
+				\caption{\label{fig:punctured_severed_sphere_standard_isomap_embedding}}
+			\end{subfigure} \hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+				\includegraphics[width=1\linewidth]{figures/Chapter_3/cross_punctured_2d_square_severed_sphere/embedding_intrinsic_isomap_local_dense}
+				\caption{\label{fig:punctured_severed_sphere_intrinsic_isomap_embedding}}
+			\end{subfigure} \hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+				\includegraphics[width=1\linewidth]{figures/Chapter_3/cross_punctured_2d_square_severed_sphere/embedding_intrinsic_isometric_local_dense}
+				\caption{\label{fig:punctured_severed_sphere_intrinsic_isometric_embedding}}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}
+			\begin{subfigure}[b]{0.32\linewidth}
+				\includegraphics[width=1\linewidth]{figures/Chapter_3/cross_punctured_2d_square_severed_sphere/standard_isomap_stress}
+				\caption{\label{fig:punctured_severed_sphere_standard_isomap_stress}}
+			\end{subfigure}
+			\hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+				\includegraphics[width=1\linewidth]{figures/Chapter_3/cross_punctured_2d_square_severed_sphere/stress_intrinsic_isomap_local_dense}
+				\caption{\label{fig:punctured_severed_sphere_intrinsic_isomap_stress}}
+			\end{subfigure}
+			\hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+				\includegraphics[width=1\linewidth]{figures/Chapter_3/cross_punctured_2d_square_severed_sphere/stress_intrinsic_isometric_local_dense}
+				\caption{\label{fig:punctured_severed_sphere_intrinsic_isometric_stress}}
+			\end{subfigure}
+		\end{centering}
+		\caption{\label{fig:punctured_severed_sphere} Punctured severed sphere (embedding). \protect\subref{fig:punctured_severed_sphere_intrinsic} Intrinsic space. 
+		\protect\subref{fig:punctured_severed_sphere_observed} Observed space. 
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_metric} Intrinsic metric. 
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_dist_est} Intrinsic distance approximation.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_dist_est_knn} Intrinsic distance approximation - $k$-NN only.
+		\protect\subref{fig:punctured_severed_sphere_standard_isomap_embedding} Standard Isomap embedding.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isomap_embedding} Intrinsic Isomap embedding.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isometric_embedding} Intrinsic Isometric embedding.
+		\protect\subref{fig:punctured_severed_sphere_standard_isomap_stress} Standard Isomap Stress.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isomap_stress} Intrinsic Isomap Stress.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isometric_stress} Intrinsic Isometric Stress.
+		}
+	\end{figure}
+
+	As expected we see that the distance approximation is indeed valid for short distances for which the manifold is approximately linearly distorted, additionally we see that geodesic distance approximation does not suffer from this since geodesics can be calculated using only local distance information. Finally we see that the  non-convexity of the intrinsic dataset does indeed cause a distortion in the intrinsic isometric embedding when compared to the ground truth.
+
+	\subsubsection{Metric estimation}
+	
+	Next we analyze the effect of using an intrinsic metric estimated from the observed data as opposed to using the exact intrinsic metric (as was the case in \cref{ssec:simulated_data_Intrinsic_isometric_embedding}). To do so we use the same example used in the previous sub-section under the setting described in \cref{ssec:Intrinsic-isotropic-GMM} with either $N_{i}=5$ or $N_{i}=200$ measurements made at each sample point, sampled from a isotropic Gaussian probability distribution centered at the sample point with intrinsic variance $\sigma_{int}^{2}=0.03^{2}$ in the intrinsic space. Additionally observation noise is added with variance $\sigma_{obs}^{2}=0.03^{2}$.
+	
+	In \cref{fig:metric_punctured_severed_sphere} we compare the trivial local estimation (as described in \cref{ssec:Intrinsic-isotropic-GMM}) and the global estimation approach implemented via a \ac{ANN} which is suggested in this paper (\cref{sec:Intrinsic-Metric-Estimation}). For each metric estimation method we plot, similarity to the previous sub-section, a visualization of the metric via ellipsis, a scatter plot of the true intrinsic distance against the approximated intrinsic distances, the resulting low-dimensional embedding and the scatter plot of the Euclidean distances in the embedding compared to the true intrinsic distance ,including a calculation of the Stress value. These are produced for the case of local estimation with dense sampling $N_{i}=200$ (\cref{fig:1a}, \cref{fig:1d}, \cref{fig:1g}, \cref{fig:1j}), for the case of sparse sampling (\cref{fig:1b}, \cref{fig:1e}, \cref{fig:1h}, \cref{fig:1k}) and finally for our sugestedd global metric estimation method (\cref{fig:1c}, \cref{fig:1f}, \cref{fig:1i}, \cref{fig:1l}).
+	
+	Similar results on several other synthetic data sets are provided as supplementary material \cref{ssec:Additional-results-manifold-learning}.
+	
+	\begin{figure}[h]
+		\begin{centering}
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/metric_local_dense}
+					\caption{\label{fig:1a}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/metric_local}
+					\caption{\label{fig:1b}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/metric_net}
+					\caption{\label{fig:1c}}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/dist_local_dense}
+					\caption{\label{fig:1d}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/dist_local}
+					\caption{\label{fig:1e}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/dist_net}
+					\caption{\label{fig:1f}}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/embedding_intrinsic_isometric_local_dense}
+					\caption{\label{fig:1g}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/embedding_intrinsic_isometric_local}
+					\caption{\label{fig:1h}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/embedding_intrinsic_isometric_net}
+					\caption{\label{fig:1i}}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/stress_intrinsic_isometric_local_dense}
+					\caption{\label{fig:1j}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/stress_intrinsic_isometric_local}
+					\caption{\label{fig:1k}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[b]{0.32\linewidth}
+					\includegraphics[width=1\textwidth]{figures/Chapter_4/cross_punctured_2d_square_severed_sphere/stress_intrinsic_isometric_net}
+					\caption{\label{fig:1l}}
+			\end{subfigure}
+		\end{centering}
+	
+	\caption{Punctured severed sphere (metric estimation).
+		\protect\subref{fig:1a} True intrinsic metric.
+		\protect\subref{fig:1b} Locally estimated intrinsic metric.
+		\protect\subref{fig:1c} Net learned intrinsic metric.
+		\protect\subref{fig:1d} Distance estimation using true metric.
+		\protect\subref{fig:1e} Distance estimation using locally estimated metric.
+		\protect\subref{fig:1f} Distance estimation using net estimated metric.
+		\protect\subref{fig:1g} Embedding using true intrinsic metric.
+		\protect\subref{fig:1h} Embedding using locally learned intrinsic metric.
+		\protect\subref{fig:1i} Embedding using net learned intrinsic metric.
+		\protect\subref{fig:1j} Embedding stress using true intrinsic metric.
+		\protect\subref{fig:1k} Embedding stress using locally estimated intrinsic metric.
+		\protect\subref{fig:1l} Embedding stress using net learned intrinsic metric}
+	
+	
+	\label{fig:metric_punctured_severed_sphere}
+	\end{figure}
+
+	We see that the estimations in the sparse case are ``noisy'' and can sometimes change abruptly between similar locations on the manifold. This noisiness in the estimated distances adversely effects the intrinsic distance estimation is the cornerstone of the algorithm suggested in \cref{sec:Intrinsic-isometric-manifold-learning} this of course damages the results of the intrinsic-isometric learned representation. Similar results on several other synthetic data sets are provided as supplementary material.
+	
+	\subsection{Localization in sensor networks}
+	\label{ssec:localization}
+	
+	In \cref{sec:motivation} we provided initial motivation for our work through the simple and intuitive example of localization in sensor networks. We now revisit this example and discuss in detail how the manifold learning algorithm proposed in this work can be applied to this problem. 
+	
+	In this experiment, we simulate positioning of an agent using observations with an unknown model, which is intended to represent the setting encountered for indoor positioning. Through this experiment we examine the advantages of intrinsic geometry preservation and demonstrate its relevance to complex, high-dimensional and realistic scenarios.
+	
+	\subsubsection{Experiment setting}
+	\label{sssec:Experiment-setting}
+	
+	The experimental setting is as follows: An agent is allowed to be located within a compact, path-connected subset $\mathcal{X}$ of $\mathbb{R}^{2}$ which represents a closed indoor environment. The shape of $\mathcal{X}$ used in this experiment is depicted in \cref{fig:Indoor-environment-shape}. At each point $\mathbf{x}\in\text{\ensuremath{\mathcal{X}}}$ a number of measurements of different modalities (which will be described later) are observed. These observations are such that they are only effected by the locations where the measurements are made (and possibly some additional noise which is assumed to be uncorrelated with the location). Such observations are made in enough different locations so that $\mathcal{X}$ is completely covered. The dimension of the intrinsic vector space is $n=2$ corresponding to the two dimensional physical space and the dimension of the observation space depends on the dimensionality of observation function output but is in general high-dimensional. 
+	
+	\begin{figure}[h]
+		\begin{centering}
+			\includegraphics[scale=0.5]{figures/Chapter_5/apt_geometry}
+		\end{centering}
+		\caption{Outline of the intrinsic manifold which represents a confined indoor environment \label{fig:Indoor-environment-shape}}
+	\end{figure}
+	
+	As discussed in \cref{sec:Intrinsic-Metric-Estimation}, in order to uncover the intrinsic metric of the manifold from the observed data, we require the intrinsic data sampling to adhere to some known structure. For this experiment the intrinsic sampling is assumed to be acquired by the use of a rigid sensor array, as described in \cref{ssec:Rigid-sensor-array}. The sensor array used consists of measurement points with a structure that corresponds to measurements in two orthogonal directions with $15cm$ distance between measurements as illustrated in \cref{fig:sensor_array_localization} and depicts the points at which measurements were performed for a sub-set of 13 sampling points.
+	
+
+	\subsubsection{Sensor modalities}
+	
+	To stress the fact that our algorithm is invariant with respect to the sensor modality (i.e to the specific observation function used), we perform simultaneous observations using multiple
+	different modalities. 
+	
+	In what follows we only discuss two vision related modalities, however results for other modalities are included in the supplementary material \cref{ssec:additional-results-localization}. 
+	
+	
+	\subsubsection*{Color camera}
+		\label{sssec:Color-camera}
+	
+	This modality simulates a camera mounted on the agent which shows the environment from the point of view of the agent. To accomplish this, we used ``Blender'', a professional, freely available and open-source 3-dimensional graphics software. Using ``Blender'' \url{www.blender.org}, we constructed a 3-dimensional model mimicking the interior of an apartment. The created model is shown in \cref{fig:3D-model-in}. The regions of the model in which there are no objects and in which the simulated agent is allowed to move, correspond to the shape of $\mathcal{X}$ presented in \cref{fig:Indoor-environment-shape}.
+
+	\begin{figure}[h]
+		\begin{centering}
+			\begin{subfigure}[b]{0.45\columnwidth}%
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/blue_print}
+			\end{subfigure} \hfill
+			\begin{subfigure}[b]{0.45\columnwidth}%
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/blue_print_3d}
+			\end{subfigure}
+		\end{centering}
+		\caption{3-dimensional model in Blender\label{fig:3D-model-in}}
+	\end{figure}
+	
+	``Blender'' allows us to render an image of the model as seen via a virtual camera. Using this ability, we produce a set of 360 degree panoramic color images of size $128\times256$ pixels, taken from the point of view of the agent as seen in \cref{fig:Room-from-Agent's}. These images serve as an observation of the location of the agent. Slight variations in the location of the agent cause slight variations in the point of view of the camera and therefore in the produced image, as seen in \cref{fig:sensor_array_localization}. These slight observed variations, combined with our assumption about the intrinsic structure of the data allow us to infer the local intrinsic metric.
+	
+	\begin{figure}[h]
+		\begin{centering}
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/roomba_view_1}
+			\end{subfigure}\hfill
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/roomba_view_2}
+			\end{subfigure}
+		\end{centering}
+	
+		\begin{centering}
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/roomba_view_3}
+			\end{subfigure}\hfill
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/roomba_view_4}
+			\end{subfigure}
+		\end{centering}
+		\caption{Samples of generated panoramic color images}
+		\label{fig:Room-from-Agent's}
+	\end{figure}
+	
+	\begin{figure}[h]
+		\begin{centering}
+			\includegraphics[width=1\textwidth]{figures/Chapter_5/sensor_array/small_var}
+		\end{centering}
+		\caption{Observation points using a rigid sensor array for a subset of 13 sample points. On the right, one can see the effect of slight variations in agents position on the viewed panoramic images \label{fig:sensor_array_localization}}
+	\end{figure}
+	
+	One of the requirements of the algorithm presented in \cref{sec:Intrinsic-isometric-manifold-learning}, was that the observations need to only be a function of the latent variable, which in this case is the 2-dimensional location of the agent. Panoramic images produced at the same location but starting from different angles would be cyclically rotated with respect to each other, thus violating this requirement. To overcome this, we make these observations invariant to cyclical rotation on the horizontal axis. We implement this in the frequency domain by applying a Fourier transform to each frame and then estimating and removing the linear phase in the horizontal direction. Since cyclical rotations in the horizontal axis are equivalent to an addition of linear phase in the Fourier domain, this makes the observation invariant to the initial cyclical rotation. 
+	
+	In order to reduce the initial dimensionality of the data, \ac{PCA} was performed and only the first 100 principle components were taken since these practically contained all the energy/power in the data.
+	
+	Images are used as inputs to our algorithm since this represents a possible realistic setting and since it is a non-liner sensor modality which is easy to simulate using 3-dimensional
+	modeling software. We wish to emphasis however, that after the per-processing stage in which these images are made invariant to cyclical rotations, the input is no longer treated as an image, and our proposed algorithm uses no additional image or computer vision related computation on the input. This invariance of the algorithm to the input type, allows us to perform the additional stage of dimensionality reduction using \ac{PCA} which would otherwise not be possible since it ``strips'' the input of its image structure.
+	
+	\subsubsection*{Depth Camera}
+	
+	An additional sensor modality, which is also produced using ``Blender'', is a gray-scale depth map, where the gray level at each pixel represents the distance, in that pixels direction, from the observing camera to the nearest object. Several examples of such images are shown in \cref{fig:Panoramic-depth-images}. Since the geometry of the image acquisition model is similar, the need for imposing invariance to cyclical rotation in the horizontal axis arises again and we perform the same per-processing stages described in \cref{sssec:Color-camera}. The dimensionality of the input is also reduced using \ac{PCA} to 40 principle component since this accounts for almost all of the observed energy/power in the data.
+
+	\begin{figure}[h]
+		\begin{centering}
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/roomba_depth_1}
+			\end{subfigure}\hfill
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/roomba_depth_2}
+			\end{subfigure}
+		\end{centering}
+	
+		\begin{centering}
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/roomba_depth_3}
+			\end{subfigure}\hfill
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/roomba_depth_5}
+			\end{subfigure}
+		\end{centering}
+		\caption{Samples of generated panoramic depth maps \label{fig:Panoramic-depth-images}}
+	\end{figure}
+	
+		
+	\subsubsection{Results}
+	
+	For each of the four modalities described above $N=1000$ intrinsic points were sampled, 3 measurement were made around each such location using the sensor array described, a 2-dimensional embedding was constructed using our proposed algorithm and using the standard Isomap methods. Results are presented in \cref{fig:Color-image-observations}, \cref{fig:Depth-image-observations}.
+			
+	\begin{figure}[h]
+		\begin{centering}
+			\begin{subfigure}[t]{0.47\columnwidth}%
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/color/intrinsic}
+				\caption{\label{fig:3a}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[t]{0.47\columnwidth}%
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/color/regular_isomap_embedding}
+				\caption{\label{fig:3b}}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}
+			\begin{subfigure}[t]{0.47\columnwidth}%
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/color/dist_local}
+				\caption{\label{fig:3c}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[t]{0.47\columnwidth}%
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/color/dist_local_knn}
+				\caption{\label{fig:3d}}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}
+			\begin{subfigure}[t]{0.47\columnwidth}%
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/color/intrinsic_isometric_local}
+				\caption{\label{fig:3e} \label{fig:bend1}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[t]{0.47\columnwidth}%
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/color/intrinsic_isometric_local_stress}
+				\caption{\label{fig:3f}} 
+			\end{subfigure}
+		\end{centering}
+		\caption{Color image observations\label{fig:Color-image-observations}. 
+			\protect\subref{fig:3a} Intrinsic space. 
+			\protect\subref{fig:3b} Embedding using standard Isomap. 
+			\protect\subref{fig:3c} Intrinsic Euclidean distance estimation. 
+			\protect\subref{fig:3d} Intrinsic Euclidean distance estimation ($k$-NN). 
+			\protect\subref{fig:3e} Intrinsic-isometric embedding. 
+			\protect\subref{fig:3f} Euclidean distance discrepancy and stress in resulting embedding}
+	\end{figure}
+	
+	\begin{figure}[h]
+		\begin{centering}
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/depth/intrinsic}
+				\caption{\label{fig:4a}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/depth/regular_isomap_embedding}
+				\caption{\label{fig:4b}}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/depth/dist_local}
+				\captionsetup{justification=centering}
+				\caption{\label{fig:4c}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/depth/dist_local_knn}
+				\caption{\label{fig:4d}}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}
+			\begin{subfigure}[t]{0.47\columnwidth}%
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/depth/intrinsic_isometric_local}
+				\caption{\label{fig:4e} \label{fig:bend2}}
+			\end{subfigure}\hfill
+			\begin{subfigure}[t]{0.47\columnwidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_5/depth/intrinsic_isometric_local_stress}
+				\caption{\label{fig:4f}}
+			\end{subfigure}
+		\end{centering}
+		\caption{Depth image observations \label{fig:Depth-image-observations}. 
+			\protect\subref{fig:4a} Intrinsic space. 
+			\protect\subref{fig:4b} Embedding using standard Isomap. 
+			\protect\subref{fig:4c} Intrinsic Euclidean distance estimation. 
+			\protect\subref{fig:4d} Intrinsic Euclidean distance estimation ($k$-NN). 
+			\protect\subref{fig:4e} Intrinsic-isometric embedding. 
+			\protect\subref{fig:4f} Euclidean distance discrepancy and stress in resulting embedding}
+	\end{figure}
+
+	Our proposed algorithm accurately retrieves the intrinsic structure for all observation modalities. This is evident by fact that the intrinsic-isometric embedding structure is almost identical to the structure of the sampled points in the intrinsic space (can be observed for both modalities by comparing \cref{fig:3a} to \cref{fig:3e} and by comparing \cref{fig:4a} to \cref{fig:4e}) and from the fact that most inter-point distances in the final embedding closely approximate the true intrinsic Euclidean distance which also leads to a low stress value for the embedding (as can be observed for both modalities in \cref{fig:3f} and \cref{fig:4f}). The success of the embedding stems form the fact that the estimated intrinsic metric allows for a good estimation of short-range intrinsic distances (as can be observed for both the modalities in \cref{fig:3c}, \cref{fig:3d}, \cref{fig:3c} and \cref{fig:3d}). We notice that since the observation functions used are not locally isometric, standard Isomap fails to retrieve the intrinsic structure of the data or to even provide a 2-dimensional parameterization of the intrinsic space (as can be observed for all the modalities in \cref{fig:3b} \cref{fig:4c}). Isomap does, for the most part, preserve proximity on a local scale (can be observed by points with similar colors being embedded close to each other) but global structure is not preserved (as can be observed for all the modalities by comparing \cref{fig:3a} and \cref{fig:3b} and \cref{fig:4a} and \cref{fig:4b}). Since standard Isomap is non-intrinsic, it is effected by the modality of the observation and we receive a different embeddings for different sensor modalities (as can be observed by comparing \cref{fig:3b} and \cref{fig:3d}).
+	
+	One noticeable weak point of our algorithm, which manifests slightly in these examples, occurs around the coordinate $\left(9,4\right)$ in the true intrinsic space (\cref{fig:3a} and \cref{fig:4a}). This region corresponds to a narrow area in the apartment model in which there are not a lot of sample points. Errors in distance estimations for these points are not ``balanced'' or ``countered'' by distance constrains in other regions of the apartment since no other distance constraints influence this region. This leads to a slight distortion in the embedding of this region which causes a ``bend'' in the global structure of the embedding (as seen in \cref{fig:bend1} and \cref{fig:bend2}).
+	
+	These results show that our proposed intrinsic-isometric dimensionality reduction algorithm could be successfully applied to the problem of localization and mapping. While this application might fall into the much researched subject of indoor mapping and localization, we wish to remark that we make no claim that this algorithm is superior or even comparable to existing algorithms tailored to specific measurement modalities or to machine learning tools trained on labeled data-sets. Our algorithms advantage that it is completely unsupervised and modality invariant which makes it especially suitable for setting where one wants to use an automatic algorithm for localization or/and when the observation model is unknown; which is often the case with indoor localization.
+
+	

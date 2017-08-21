@@ -1,0 +1,362 @@
+\externaldocument{paper.tex}
+	\section{Conclusions}
+		\label{sec:conclusions}
+		
+		In this work, we addressed the subject of intrinsic and isometric
+	manifold learning. We first showed that the need for methods, which
+	preserve the latent Euclidean geometric structure of data manifolds,
+	arises naturally when inherently low-dimensional systems are observed
+	via high-dimensional non-linear measurements or observations. We presented
+	a new manifold learning algorithm which uses local properties of the
+	observation function to estimate a local intrinsic metric (the ``push-forward''
+	metric of the observation function). This metric was then used to
+	estimate intrinsic geometric proprieties of the data directly from
+	the observed manifold as if they were calculated in the low-dimensional
+	latent space. We discussed a few settings under which estimation of
+	the required local observation function properties is possible from
+	the observed data itself. Unfortunately, we recognized that due to
+	their local nature, these metric estimation methods are not sufficiently
+	robust to high curvature of the observation function as well as to
+	noise. We suggested to overcome this by parameterizing all estimated
+	intrinsic metrics on the observed manifold as the output of a single
+	\ac{ANN} and performing a signal optimization in order to estimate
+	all local intrinsic metric simultaneously. This procedure has probabilistic
+	reasoning and was shown to be equivalent to maximum-likelihood estimation
+	under a certain statistical model. We showed that this couples the
+	metric estimations at different points on the manifold, regularizes
+	the estimation and imposes smoothness of the estimated metric. We
+	discussed the possibility of additionally imposing regularization
+	on the estimation by the net structure and weight decay terms, which
+	is common practice in \acp{ANN}. By combining a robust intrinsic
+	metric estimation method and an algorithm which can use these metrics
+	to build an intrinsic and isometric embedding, we devised an algorithm,
+	which can automatically recover the geometric structure of a latent
+	low-dimensional manifold from its observations via an unknown non-linear
+	high-dimensional function. Finally we focused on the example of mapping
+	and positioning an agent using a sensor network of unknown nature
+	and modalities. We showed that our proposed algorithm can recover
+	the structure of the space in which the agent moves and can correctly
+	position the agent within that space. Due to the intrinsic nature
+	of our method, it can perform this mapping and positioning without
+	the need for prior knowledge of a measurement model to explain the
+	connection between the observed measurements and the position of the
+	agent. This invariance to the type of measurement used, was shown
+	to be suitable in a setting such as indoor positioning where the exact
+	measurement model is usually unknown.
+	
+	It is evident that our method outperforms the local metric estimation
+	approach for all the tested examples and enables us to learn intrinsically-isometric
+	representation for broader cases problems given very sparse sampling
+	and observation noise of the same scale of the intrinsic variance
+	which is used to estimate the intrinsic metric. 
+	
+	The use of neural networks as regression functions. provides a powerful
+	regularizing factor in intrinsic metric estimation. Their general
+	structure with the plethora of optimization algorithms, regularization
+	tweaks and efficient implementation methods make them a very good
+	candidate for a parametric function family to be used in the problem
+	of metric estimation.
+	
+	The estimation method described in this chapter was proven to have
+	probabilistic reasoning when assuming an intrinsic-isometric \ac{GMM},
+	however it also has an intuitive interpretation in a more general
+	case. As can be observed in \cref{eq:KL}, the network tries approximate
+	locally calculated estimations of the intrinsic metric while adhering
+	to a globally smooth and regularized model. This can serve as a good
+	general heuristic method to impose global smoothness and regularization
+	on locally estimated intrinsic metrics under other probabilistic or
+	non-probabilistic setting such as the one presented in
+	\cref{ssec:Intrinsic-isotropic-GMM}.
+	
+	A somewhat similar method was presented in \cite{bengio2004non} where
+	an \ac{ANN} was also used in order to parametrize the spanning vectors
+	of the local tangent plane to a manifold. The only criterion provided
+	for the estimation was minimization of the distance of observed points
+	from the local tangent plane. The estimation was not given probabilistic
+	reasoning and the estimated spanning vector had no physical meaning
+	and did not provide any metric interpretation of information. In our
+	work, we not only retrieve the tangent plane to the manifold at each
+	point but also an intrinsic metric and we do so with probabilistic
+	reasoning.
+	
+	In the case of neural networks ``the devil is in the details'' and
+	implementation plays a large role in the final performance of the
+	trained network and the subjects of neural network training and regularization
+	are vast topics which are out of the scope of this work. Our main
+	contribution is to show that neural networks can, in principle be
+	used, to regularize estimations and in this specific case intrinsic
+	metric estimation and we do not attempt to claim that this architecture
+	and optimization procedure achieve an optimal solution.
+	
+	The global estimation approach presented in this chapter has some
+	secondary advantages in addition to providing additional robustness
+	to the intrinsic metric estimation when compared to local metric estimation
+	methods. As opposed to local methods which only estimate the intrinsic
+	metric for observed sample points, the regression approach produces
+	an estimation of the intrinsic metric on the whole observed space.
+	This can be possibly used to generate additional points in between
+	existing points, thus artificially increasing the sample density.
+	This can improve both the short-range intrinsic distance estimation
+	described in \cref{ssec:Intrinsic-geometry-approximation} and
+	the geodesic distance estimation described in \cref{ssec:Global-geometry-approximation}.
+	Both effects should improve the results of the algorithm presented
+	in \cref{sec:Intrinsic-isometric-manifold-learning}.
+	
+	In \cite{bengio2004non} it was shown that by leaning the tangent
+	space to the manifold at each point, one can ``walk'' on the manifold
+	by making infinitesimal steps each time in the tangent space. Since
+	with the method suggested in this chapter, we do not only estimate
+	the tangent space but the intrinsic metric as well, we know how far
+	we have gone in terms of the distance, an ability that might be relevant
+	to applications such as non-linear interpolation \cite{bregler1995nonlinear}.
+	
+	
+	\subsection{Pre-processing}
+		\label{subsec:Pre-processing}
+	
+	Since our approach does not assume anything about the structure of
+	the observed data, one can perform pre-processing stages for reducing
+	the dimensionality of the data and possibly removing noise without
+	worrying about maintaining the structure of the data. This has the
+	advantage of enabling the use of other existing dimensionality reduction
+	methods as pre-processing stages to our algorithm. For example, when
+	localization and mapping were performed using image data, the algorithm
+	did not treat the data as images, which allowed us to use \ac{PCA}
+	to lower the dimensionality of the image data greatly. This would
+	not be possible for vision based algorithms which exploit the image
+	structure since the application of \ac{PCA} would remove this structure
+	and such algorithm could no longer be applied. For our method the
+	image structure is unimportant and one can do without it.
+	
+	\subsection{Practical application to indoor-positioning}
+		\label{subsec:Practical-application-to}
+	
+	The ability to localize sets of measurements without knowledge of
+	the model connection positions and measurements is a problem encountered
+	in real life indoor positioning due to the complexity of the models
+	and the variations, as described in \cref{sec:introduction}.
+	Learning a model for each specific setting requires large amount of
+	labeled data. Our algorithm might replace the need for labeled data
+	acquisition with a simple prior assumption on the unlabeled measurement
+	acquisition process. 
+	
+	This has been showed to work in theory however it has yet to be applied
+	to a realistic indoor positioning system. Basic physical experiments
+	using a randomly walking agent in 2-dimensional space are underway.
+	In these experiments a robotic iRobot Roomba programmable robotic
+	vacuum cleaner was controlled by a Raspberry-Pi mini computer and
+	performed a random walk inside a 2-dimensional region. Signal acquisition
+	was performed either my measuring the \ac{RSS} from WiFi stations
+	or via a wide angle lens which produced 360 degree images. Results
+	from the experiments will be published when concluded. Images from
+	these experiments are shown in \cref{fig:Roomba-experiments}.
+	
+	\iffalse
+	\begin{figure}[h]
+		\begin{centering}
+			\begin{minipage}[t]{0.45\columnwidth}%
+				\begin{flushleft}
+					\subfloat[\ac{RSS} measurement]{\begin{centering}
+							\includegraphics[width=1\textwidth]{figures/Chapter_6/Roomba_wifi}
+							\par\end{centering}
+					}
+					\par\end{flushleft}%
+			\end{minipage}\hfill{}%
+			\begin{minipage}[t]{0.45\columnwidth}%
+				\subfloat[Panoramic camera]{\begin{centering}
+						\includegraphics[width=1\textwidth]{figures/Chapter_6/Roomba_pano}
+						\par\end{centering}
+				}%
+			\end{minipage}
+			\par\end{centering}
+		\caption{Roomba experiments \label{fig:Roomba-experiments}}
+	\end{figure}
+	\fi
+	
+	
+	\subsection{Generalized localization problems}
+	
+	Throughout this work and in \cref{sec:introduction} and
+	\cref{ssec:localization} specifically, we discussed the problem
+	of localization in sensor networks and presented it as an example
+	of a problem which requires an intrinsic and isometric manifold learning
+	method in order to fully utilize the observed data and recover a mapping
+	of the physical space and a localization of an agent within this space.
+	However, this should not be regarded as a specific problem (although
+	it is by itself an important one) but as a general prototypical problem,
+	for which physical localization in 2-dimensional or 3-dimensional,
+	is just one intuitive manifestation. Indeed, any problem where the
+	uncovering of the global geometric structure of a low-dimensional
+	parameter space is desirable, can be regarded as a ``localization
+	`` problem. Trivially, this can occur when structure recovery is
+	by itself a goal and one can think of many examples where the global
+	structure of the parameter space is important or has some special
+	meaning (for example for imaging or molecule structure recovery),
+	yet this global structure is also crucial when one requires the intrinsic
+	structure of a low-dimensional vector space. The process of observation
+	via a non-linear function causes the data to lose its global structure,
+	and the initially ``flat'' manifold becomes curved. This hinders
+	our ability to perform operations on the parameter space which require
+	a vector space structure such as addition, subtraction, division and
+	multiplication. This are the basic operation required for more high-level
+	processing such as averaging, clustering, interpolation, learning
+	using $k$-NN (especially when samples are sparse and neighbors are
+	far from each other) etc. Embedding the data back into a low-dimensional
+	space recovers the vector space structure of the original latent space
+	and enables these operations.
+	
+	\subsection{Automatic labeled data acquisition}
+	
+	Supervised machine learning uses labeled data (consisting of pairs
+	of input objects and desired output values) and attempts to ``learn''
+	or infer a functional connection between the two. Learning using more
+	labeled data increases the learners ability to unseen examples and
+	usually leads to better performance of the trained model. Unfortunately
+	acquisition of labeled data is usually non-trivial, expensive and
+	requires an already existing method to correctly label data. Our proposed
+	approach can be seen as a method for automatic acquisition of labels
+	as it operates in a completely unsupervised manner and produces data
+	labeling as an output. The ability to produce labeled data can thus
+	be reduced to the task of exploring the parameter space of the system
+	under some restriction or statistical model which allows us to calculate
+	a local intrinsic metric as described in this work. 
+	
+	This automatic acquisition of labeled data can be much easier in many
+	cases than producing labeled data using an existing labeling method.
+	As an example we return to the localization example discussed in depth
+	in \cref{ssec:localization}. To acquire labeled data in
+	the described setting, one would be required to perform a large set
+	of observations (color images, depth maps, \ac{RSS} values etc.)
+	and provide for each such observation the 2-dimensional coordinates
+	at which they were taken. This procedure requires time, patience and
+	an existing way to measure the correct coordinates. This becomes even
+	more complicated if one considers localization in 3-dimensional space
+	where accurate positioning requires special equipment. Alternatively,
+	with our approach, one could use a randomly waking agent or a simple
+	sensor array (as described in \cref{sec:Intrinsic-Metric-Estimation})
+	to acquire a large set of unlabeled data, and then use our proposed
+	algorithm to retrieve an approximation of their labels. One can then
+	use a supervised machine learning algorithm in order to infer the
+	label of new observations. In the application described in \cref{ssec:localization}, once labeling of a large set of images
+	from the apartment space is acquired using our algorithm, one can
+	feed these to a vision based algorithm which can be robust to variation
+	in appearance of the space, such as changes of illumination, obstructions,
+	or even some changes in the structure of the apartment due to movement
+	of some objects.
+	
+	\subsection{Holistic approach}
+	
+	The algorithm presented in this work suggests a two-stage solution
+	for intrinsic-isometric embedding of manifolds in low-dimensional
+	Euclidean space:
+	\begin{enumerate}
+		\item Recovering local intrinsic metrics using prior-knowledge and assumptions
+		about the intrinsic process and using them to calculate intrinsic
+		inter-point distances.
+		\item Constructing and embedding of the observed points into a low-dimensional
+		space, where the Euclidean distance respects the calculated intrinsic
+		inter-point distances.
+	\end{enumerate}
+	If the first stage of this approach does not result in accurate enough
+	estimations of the intrinsic geometry, the second stage can potentially
+	fail. Combining the two stages described above into a one stage embedding
+	method could be beneficial. A possible way to implement this is to
+	directly learn an embedding function of the observed data into a low-dimensional
+	space such that the embedding best fits prior-knowledge or assumption
+	we have about the intrinsic system. This could be implemented for
+	example with an \ac{ANN} for which the cost function will be the
+	likelihood that the embedding originated from the statistical model
+	of the intrinsic latent system. Such an implementation would however,
+	rarely converge to minima which represent a good embedding of the
+	data without being given an initial solution which is close enough
+	to the true structure. One can however use the embedding received
+	via the presented two stage approach as an initial target embedding
+	for such an \ac{ANN}, and then further maximize the likelihood of
+	the embedding directly on the embedding space. 
+	
+	\subsection{Sensor fusion}
+	
+	The fact that our proposed algorithm is invariant to the observation
+	function, allows sensor fusion. Measurements from different sensors
+	modalities can be simply concatenated, creating a higher-dimensional
+	observation function. Although this should work in theory, it is clear
+	that if the sensors are improperly scaled with respect to each other
+	this will not be optimal. Further research should be invested in considering
+	the proper way to fuse different measurement modalities in a way that
+	optimizes the results of the algorithm. 
+	
+	\subsection{Towards data-driven Taken's embedding}
+	
+	Our algorithm attempts to produce an embedding of the observed manifold
+	into a low-dimensional space, where similar observations are embedded
+	to similar locations in the constructed embedding space. This causes
+	a problem if different intrinsic points have identical or very similar
+	observation values. In this work we resolved this by assuming that
+	the observation function is invertible. One practical approach to
+	deal with this situation is to add observations until any such similar
+	points are distinguished. However, when a set of observations is given
+	and one cannot add additional ``physical'' observations we require
+	a different way required. If temporal information about the dynamical
+	observation process is available one can, in principle, distinguish
+	points by their respective past and future observations. Such a separation
+	between points would be especially beneficial in the presence of high
+	levels of observation noise which might make originally distinct measurement
+	values similar to each other. Our proposed algorithm currently uses
+	temporal side-information only for the stage of estimating the intrinsic
+	metric and does not incorporate this information for the purpose of
+	the final embedding into low-dimensional space. One possible approach
+	for incorporating this information naturally into our algorithm is
+	by the observation of several lagged measurements simultaneously,
+	by looking far ``enough'' into the past, such that any two points
+	become distinguishable. This was proven for the case of deterministic
+	latent dynamical system by Taken's embedding theorem \cite{takens1981detecting}.
+	
+	\subsection{Implementation using vector-diffusion maps}
+	
+	Our proposed manifold learning algorithm computes global intrinsic
+	geometric properties by using the shortest-path algorithm in order
+	to approximate inter-point geodesic distances. The shortest-path algorithm
+	operated by propagating the distance function from a source point
+	across the manifold. A similar process of propagating local vector
+	information (instead of scalar distance information) could be used
+	to allow for direct long range intrinsic Euclidean distance estimation.
+	A framework for vector diffusion on Riemannian manifold has been presented
+	in \cite{singer2012vector} and could possibly be used in order to
+	implement this. Euclidean distance estimation by vector diffusion
+	should be unaffected by non-convexity of the intrinsic manifold and
+	can allow for use of global distances making the final embedding more
+	robust.
+	
+	\subsection{Incorporating labeled data}
+		\label{subsec:Incorporating-labeled-data}
+	
+	The algorithm proposed in this work operates in a completely unsupervised
+	manner. The only prior-knowledge used is the assumption about the
+	intrinsic data structure, which allows for estimation of the local
+	intrinsic metric. While this is a desired property of the algorithm,
+	since labeled data is usually harder to gather relative to unlabeled
+	data, it does not harness the advantages of labeled data if such data
+	does exist. We mention two possible ways to incorporate existing labeled
+	data. Labeled data can be used as part of the intrinsic metric learning,
+	where similar settings have been used in existing works in order to
+	generate metrics which best describe existing label variations on
+	data manifold \cite{yang2006distance,xing2003distance}. Alternatively,
+	labeled data can be used in the embedding procedure itself, where
+	one can easily add additional distance restriction known from labeled
+	data. In the localization example given in \cref{ssec:localization}
+	for example, we notice a slight distortion in the embedding on a global,
+	long-range scale. This is because we only incorporate local distance
+	information in the final embedding optimization, which does not fully
+	restrict the global conformation in practical noisy situations. The
+	short-distance estimations have errors, which induce slight distortions
+	in the embedding. These distortions are not significant on small scales
+	but they accumulate on larger scales and longer distances. Adding
+	a few robustly measured long distances can be extremely beneficial
+	for correcting this and even a very low number of such constraints
+	could stabilize the embedding considerably, removing this accumulated
+	error. Incorporating such robustly measured distances in the algorithm
+	suggested in \cref{sec:Intrinsic-isometric-manifold-learning}
+	can be done easily by giving such distance constraints much larger
+	weights in the stress function presented in (\cref{eq:w-intrinisc_stress})
+	than those of distances estimated from the observed data, which are
+	less reliable.

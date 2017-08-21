@@ -1,0 +1,88 @@
+% SIAM Article Template
+\documentclass[review]{siamart1116}
+
+% Information that is shared between the article and the supplement
+% (title and author information, macros, packages, etc.) goes into
+% ex_shared.tex. If there is no supplement, this file can be included
+% directly.
+
+\input{ex_shared}
+
+% Optional PDF information
+\ifpdf
+\hypersetup{
+	pdftitle={\TheTitle},
+	pdfauthor={\TheAuthors}
+}
+\fi
+
+% The next statement enables references to information in the
+% supplement. See the xr-hyperref package for details.
+
+\externaldocument{ex_supplement}
+
+% FundRef data to be entered by SIAM
+%<funding-group>
+%<award-group>
+%<funding-source>
+%<named-content content-type="funder-name"> 
+%</named-content> 
+%<named-content content-type="funder-identifier"> 
+%</named-content>
+%</funding-source>
+%<award-id> </award-id>
+%</award-group>
+%</funding-group>
+
+\begin{document}
+	\begin{acronym}
+		\acro{ADAM}{ADAptive Moment estimation}
+		\acro{ANN}{Artificial Neural Network}
+		\acro{AWGN}{Additive White Gaussian Noise}
+		\acro{EDM}{Euclidean Distance Matrix}
+		\acro{EDMCP}{Euclidean Distance Matrix Completion Problem}
+		\acro{GMM}{Gaussian Mixture Model}
+		\acro{LLE}{Locally Linear Embedding}
+		\acro{LS-MDS}{Least Squares Multi Dimensional Scaling}
+		\acro{MDS}{Multi Dimensional Scaling}
+		\acro{MVU}{Maximum Variance Unfolding}
+		\acro{PCA}{Principal Component Analysis}
+		\acro{RSS}{Received Signal Strength}
+		\acro{SDE}{Stochastic Differential Equation}
+		\acro{SDP}{SemiDefinite Programming}
+		\acro{SMACOF}{Scaling by MAjorizing a COmplicated Function}
+		\acro{SVD}{Singular Value Decomposition}
+	\end{acronym} 
+	
+	\maketitle
+	
+	% REQUIRED
+	\begin{abstract}
+		Data lying on manifolds commonly appear in machine learning, signal processing and data analysis. It is often the case that although these manifolds are inherently low-dimensional, they are embedded in an ambient space of a much higher dimension. Manifold learning techniques aim to recover the low-dimensional structure of the data hidden in the observed data samples. This is often accomplished by building alternative low-dimensional representations of the data while preserving, as much as possible, some of its observed properties which are usually related to the geometric structure of the observed data samples. In this paper, we propose to deviate from this standard practice. Instead of learning the structure of the observed manifold, we view the observed data only as a proxy to a latent unobserved intrinsic manifold for which build a new geometry preserving representation. In particular, we propose a new manifold learning method that uses the push-forward metric, between the latent intrinsic manifold and the observed manifold, in order to compute geometric properties on the observed data manifold as if they were computed directly on the underlying latent intrinsic manifold. We show that using this intrinsic metric, it is possible to learn an intrinsic and isometric data representation which respects the latent manifold geometry. We further propose a method for robust estimation of the push-forward metric from observed data without knowledge of the system model using artificial neural networks. Finally, we show that the proposed approach can be successfully applied to the problem of indoor localization in ad-hoc sensor networks of unknown type. In particular, we demonstrate that we can discover the physical space and infer a non-linear function which maps sensor measurements to a location in the physical space allowing us to localize an agent, all without knowing a-priori the nature of the connection between the agent location and the sensor measurements.
+	\end{abstract}
+	
+	% REQUIRED
+	\begin{keywords}
+		manifold learning, geodesic distance, inverse problem, metric estimation, intrinsic, isometric, positioning, sensor invariant
+	\end{keywords}
+	
+	% REQUIRED
+	\begin{AMS}
+		??????
+	\end{AMS}
+	
+
+	\input{Intro.tex}
+	\input{IntrinsicIsometricManifoldLearning.tex}
+	\input{IntrinsicMetricEstimation.tex}
+	\input{ExperimentalResults.tex}
+	\input{Discussion.tex}
+	\appendix
+	\input{Appendix.tex}
+
+
+	
+	\bibliographystyle{siamplain}
+	\bibliography{references}
+	
+\end{document}

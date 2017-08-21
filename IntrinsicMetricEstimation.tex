@@ -1,0 +1,320 @@
+\externaldocument{paper.tex}
+
+
+	\section{Intrinsic Metric Estimation}
+		\label{sec:Intrinsic-Metric-Estimation}
+
+	In the algorithm presented in \cref{sec:Intrinsic-isometric-manifold-learning}
+	we assumed that the matrix $\mathbf{M}\left({\bf y}_{i}\right)$ was
+	given for all $\text{\ensuremath{\mathbf{y}}}_{i}\in\mathcal{Y}_{s}$.
+	This matrix was used for the computation of an intrinsic metric on
+	the observed manifold $\mathcal{Y}$ that locally ``cancels-out''
+	the distorting effect of the observation function. The use of this
+	intrinsic metric allowed us to approximate intrinsic Euclidean and
+	geodesic inter-point distances and was one of the key ingredients
+	to uncovering the intrinsic geometrical structure of the latent manifold.
+	The ability to apply the algorithm suggested in \cref{sec:Intrinsic-isometric-manifold-learning}
+	to practical real-life problems therefore depends on how reasonable
+	it is to assume that $\mathbf{M}\left({\bf y}_{i}\right)$ is known
+	or can be robustly approximated from observed data.
+	
+	In this chapter, we address this issue by first giving a few examples
+	of settings under which we can, under different prior assumptions,
+	approximate $\mathbf{M}\left({\bf y}_{i}\right)$ from approximately-linear
+	patches of the observe manifold. We then recognize that due to non-linear
+	nature of the observation function, estimation methods requiring approximate
+	linearity are local in nature and thus not robust and susceptible
+	to noise when data is not sufficiently densely sampled. To overcome
+	this, we propose a non-local metric estimation method where we use
+	an \ac{ANN} parametric regressor for $\mathbf{M}\left({\bf y}_{i}\right)$
+	on the whole observed manifold simultaneously. We show that by using
+	smooth non-linearities in the net and additionally restricting the
+	net structure and its weights, we provide sufficient regularization
+	to the estimation process, making it more robust to the factors mentioned
+	above. Lastly, we show that improving the intrinsic metric estimation
+	makes the algorithm presented in \cref{sec:Intrinsic-isometric-manifold-learning}
+	applicable to problems where other local metric estimation methods
+	are not successful, extending the range of problems to which we can
+	apply our method of intrinsic-isometric manifold learning.
+	
+	
+
+	\subsection{Global metric estimation}
+	\label{ssec:Global-metric-estimation}
+	
+	A common characteristic of the estimation methods described in the
+	Section \cref{sec:Local-intrinsic-metric} is that they operated on
+	a scale on which the observation function $f$ is approximately linear
+	and can be well approximated by its Jacobian. Working on larger scales,
+	on which this assumption is not true, and taking samples which are
+	further away from the point of estimation will have a negative effect
+	on the resulting estimation since distant samples experience different
+	observation function Jacobians and therefore have different intrinsic
+	metrics. The curvature of the manifold dictates how fast the Jacobian
+	and the metric changes along the manifold and therefore restricts
+	the scale at which samples are relevant for estimation of the metric
+	at a specific point. High non-linearly of observation function can
+	make the scale on which the estimation is performed very small. If
+	the data is not sufficiently densely sampled (as is often the case
+	in practice in realistic situations), the number of data points that
+	will be incorporated into the estimation of a single local metric
+	will be small, resulting in an estimation which has high variance
+	and susceptible to observation noise. This non-robustness is not unique
+	to these specific metric estimation methods and many non-linear estimation
+	problems and manifold learning techniques are non-robust due to their
+	local nature as discussed in \cite{bengio2004non}. 
+	
+	A possible way to overcome this is by imposing a global regularization
+	factor on the metric estimation. Such a term should encourage metric
+	estimations which are more ``reasonable'', not only on a local scale
+	but also globally. In our setting we assume that the observation function
+	$f$ is a continuously-differentiable and smooth, therefore the intrinsic
+	metric (which we showed depended only on the observation function
+	Jacobian) should also change smoothly on the manifold, making estimations
+	such at the one received for the sparsely sampled manifold in \cref{fig:Intrinsic-metric-estimation} very unlikely. Adding a restriction
+	that metrics estimated at close points on the observed manifold will
+	be similar to each other should steer the estimation towards more
+	``reasonable'' outcomes and reduces the estimator variance making
+	it more robust.
+
+	\subsection{Maximum-Likelihood intrinsic metric estimation\label{sec:Intrinsic-metric-estimation}}
+	
+	In the setting presented in Subsection \cref{ssec:Intrinsic-isotropic-GMM},
+	we saw that the observed data can be regarded as a \ac{GMM} model
+	with covariance matrices which are effected by the observation function
+	Jacobian, as seen in Equation \cref{eq:prob-pca}. An unconstrained
+	maximum-likelihood estimation of $\mathbf{M}\left({\bf y}_{i}\right)$
+	for that setting produces a local estimator which only used data from
+	a single Gaussian and did not impose any smoothness on the metrics
+	estimated on the whole manifold. As a result, this estimation suffers
+	from the problems described in \cref{subsec:Benefits-of-non-local}.
+	To overcome this we suggest adopting a similar probabilistic viewpoint
+	but to instead use a constrained non-local maximum-likelihood estimator.
+	The intrinsic isotropic \ac{GMM} model described in \cref{ssec:Intrinsic-isotropic-GMM}
+	results in the following approximate global log-likelihood function
+	for the observed data:
+	\begin{equation}
+	\mathcal{L}\left(\left\{ f\left(\mathbf{x}_{i}\right)\right\} _{i=1}^{N},\left\{ \frac{df}{dx}\left(\mathbf{x}_{i}\right)\frac{df}{dx}\left(\mathbf{x}_{i}\right)^{T}\right\} _{i=1}^{N}\right)=-\frac{1}{2}\sum_{i=1}^{N}N_{i}\left\{ d\text{ln}\left(2\pi\right)+\text{ln}\left|\mathbf{C}_{i}\right|+\text{Tr}\left(\mathbf{C}_{i}^{-1}\mathbf{S}_{i}\right)\right\} 
+	\end{equation}
+	Where, $N$ is the number of Gaussian distribution in the \ac{GMM},
+	$N_{i}$ is the number of points sampled from the $i$-th Gaussian
+	distribution, $\mathbf{S}_{i}$ is the sample covariance of the $i$-th
+	observed Gaussian distribution and $\mathbf{C}_{i}$ denotes the covariance
+	which can be explained by the model:
+	\begin{equation}
+	\mathbf{C}_{i}=\sigma_{int}^{2}\frac{df}{dx}\left(\mathbf{x}_{i}\right)\frac{df}{dx}\left(\mathbf{x}_{i}\right)^{T}+\sigma_{obs}^{2}\mathbf{I}=\sigma_{int}^{2}\mathbf{M}\left({\bf y}_{i}\right)+\sigma_{obs}^{2}\mathbf{I}
+	\end{equation}
+	This log-likelihood is also presented in \cite{tipping1999mixtures}.
+	If we are free to estimate $\mathbf{M}\left({\bf y}_{i}\right)$ by
+	choosing its most likely value for each cluster independently, we
+	get the same metric estimation described in \cref{ssec:Intrinsic-isotropic-GMM}.
+	In order to avoid this, we instead assume that the observation function
+	Jacobian belongs to a parametric family of functions which we denote
+	$\mathbf{J}\left({\bf y}_{i}|\theta\right):\mathbb{R}^{m}\to\mathbb{R}^{m\times n}$
+	where $\theta$ represents the parameterization of this family. This
+	family of matrix valued functions will represent the unknown observation
+	function Jacobian $\frac{df}{dx}\left(f^{-1}\left({\bf y}_{i}\right)\right)$
+	. Estimation is performed by choosing a specific function from this
+	family which best explains the observed data. Mathematically, this
+	is equivalent to choosing $\theta$ that maximizes the parameterized
+	log-likelihood function:
+	\begin{equation}
+	\mathcal{L}\left(\left\{ {\bf y}_{i.j}\right\} |\theta\right)=-\frac{1}{2}\sum_{i=1}^{N}N_{i}\left\{ d\text{ln}\left(2\pi\right)+\text{ln}\left|{\bf C}\left({\bf y}_{i}|\theta\right)\right|+\text{Tr}\left(\mathbf{\mathbf{C}}\left({\bf y}_{i}|\theta\right)^{-1}\mathbf{S}_{i}\right)\right\} \label{eq:Ann-cost}
+	\end{equation}
+	Where:
+	\[
+	\mathbf{C}\left({\bf y}_{i}|\theta\right)=\sigma_{int}^{2}\mathbf{J}\left({\bf y}_{i}|\theta\right)\mathbf{J}\left({\bf y}_{i}|\theta\right)^{T}+\sigma_{obs}^{2}\mathbf{I}
+	\]
+	The restriction of the Jacobian function to a specific class of possible
+	functions, limits the possible estimation results. By using a parametric
+	family of smooth functions we can avoid unreasonable estimations results
+	corresponding to rapidly varying metrics on the manifold, thus making
+	the estimation more robust. Finding the optimal function from the
+	family estimates the Jacobian (and the intrinsic metric) for all points
+	in the observed space simultaneously, unlike in the unconstrained
+	case where an optimization is performed multiple times ,once for each
+	cluster. By representing the observation function Jacobian as the
+	output of a single function we tie to estimations of the intrinsic
+	metrics on the whole manifold manifold . This estimation is no longer
+	local and samples over the whole manifold can potentiality effect
+	the estimation on other points on the manifold. A estimation for a
+	local metric might fit the observed data perfectly at one point but
+	if the estimated Jacobian $\mathbf{J}\left(\mathbf{y}|\theta\right)$
+	does not provide a reasonable explanation for the observed data on
+	the whole manifold it will be deemed unlikely.
+
+	The log-likelihood in \cref{eq:Ann-cost} only differs by a constant from the following function:
+	\begin{equation}
+	\begin{aligned}R\left(\left\{ {\bf y}_{i.j}\right\} |\theta\right) & =-\sum_{i=1}^{N}N_{i}D_{KL}\left(\mathbf{C}_{i}||\mathbf{S}_{i}\right)\\
+	& =-\sum_{i=1}^{N}N_{i}\left\{ \text{ln}\frac{\left|\mathbf{C}_{i}\right|}{\left|\mathbf{S}_{i}\right|}+\text{Tr}\left(\mathbf{C}_{i}^{-1}\mathbf{S}_{i}\right)\right\} \\
+	& =\mathcal{L}\left(\left\{ {\bf y}_{i.j}\right\} |\theta\right)+\frac{1}{2}\sum_{i=1}^{N}N_{i}\left\{ d\text{ln}\left(2\pi\right)-\text{ln}\left|\mathbf{S}_{i}\right|\right\} \\
+	& =\mathcal{L}\left(\left\{ {\bf y}_{i.j}\right\} |\theta\right)+constant
+	\end{aligned}
+	\label{eq:KL}
+	\end{equation}
+	Where $D_{KL}\left(\mathbf{C}_{i}||\mathbf{S}_{i}\right)$ is the well known Kullback\textendash Leibler divergence between Gaussian distributions with the same mean and two different covariances matrices $\text{\ensuremath{\mathbf{C}_{i}}}$ and $\mathbf{S}_{i}$. This divergence receives a minimal value of zero when these covariances are equal. Thus maximization of the likelihood is equivalent to minimization of the discrepancy, in terms of the Kullback\textendash Leibler divergence, between the covariance that can be explained by the estimation of the Jacobian function and the sample covariance observed in the data cluster. 
+	
+	\subsection{Estimation and regularization using artificial neural networks}
+	
+	\cref{sec:Intrinsic-metric-estimation} gave us a probabilistic framework for non-local estimation of the intrinsic metric by using a parametric family of functions, however it did not specify which parametric family to use. We suggest the use of an \ac{ANN} for this purpose. Neural networks are compositions of linear transformations and non-linear operation nodes which can be adapted to approximate a specific function by choosing the values of the linear transformations in the network, these are also called the ``weights'' of the network. Thus, the parameter vector $\theta$ to be optimized represents, for the case of \ac{ANN}, all the weights of the network. By choosing the non-linear operation nodes to be smooth functions, we can explicitly impose the smoothness of net output function. We used the commonly used standard sigmoid function:
+	
+	\[
+	s\left(x\right)=\frac{1}{1+e^{-x}}
+	\]
+	
+	The inputs to the network are coordinates of points in the observed measurement space and the outputs are vectors of dimension $n\cdot m$ which are reshaped to an $n\times m$ matrix $\mathbf{J}\left({\bf y}_{i}|\theta\right)$ and serve as approximations of the observation function Jacobian at the corresponding input points. The optimal estimation is achieved by optimizing over the weights of the network so that the likelihood function \cref{eq:Ann-cost} is maximized. The neural network structure used in this work contains two hidden layer and an additional linear layer at the output, which was added in order to allow for automatic scaling of the output to the correct problem scale. Our suggested network structure is visualized in \cref{fig:Suggested--structure}.
+	
+	\begin{figure}[h]
+		\begin{centering}
+			\begin{minipage}[t]{1\columnwidth}%
+				\begin{center}
+					\graphicspath{ {figures/Chapter_4/} } 
+					\def\layersep{2.8 cm} 
+					\def\nodeSize{40 pt}
+					\def\nInputNodes{3} 
+					\def\nInputNodesMinusOne{2} 
+					\def\nInputNodesPlusOne{4}
+					\def\nHiddenNodes{5} 
+					\def\nHiddenNodesMinusOne{4} 
+					\def\nHiddenNodesPlusOne{6} 
+					
+					\begin{tikzpicture}[shorten >=1pt,->,draw=black!50, node distance=\layersep,thick,scale=0.9, every node/.style={transform shape}] 
+					\tikzstyle{every pin edge}=[<-,shorten <=1pt]     
+					\tikzstyle{neuron}=[circle,draw, ultra thick,fill=black!25,minimum size=27pt,inner sep=0pt]     	
+					\tikzstyle{input neuron}=[neuron, fill=green!50]     
+					\tikzstyle{output neuron}=[neuron, fill=red!50]     
+					\tikzstyle{hidden neuron}=[neuron, fill=yellow!50]     
+					\tikzstyle{encoding neuron}=[neuron, fill=gray!50]    
+					\tikzstyle{annot} = [text width=4em, text centered]
+					
+					% Draw the input layer nodes     
+					\path[yshift=-\nodeSize] 		
+					node[input neuron, pin=left:$y_1$] (I-1) at ({0*\layersep},-1*\nodeSize) {};
+					\path[yshift=-\nodeSize] 		
+					node[input neuron, pin=left:$y_2$] (I-2) at ({0*\layersep},-2*\nodeSize) {};
+					\path[yshift=-\nodeSize] 		
+					node[input neuron, pin=left:$y_m$] (I-\nInputNodes) at (0*\layersep,-\nInputNodesPlusOne*\nodeSize) {};
+					\path[-] (I-\nInputNodesMinusOne) edge (I-\nInputNodes) [dotted];
+					
+					% Draw the first hidden layer nodes     
+					\foreach \name / \y in {1,...,\nHiddenNodesMinusOne}         
+					\path[yshift=0.0cm] 	    	
+					node[hidden neuron] (H1-\name) at (1*\layersep,-\y*\nodeSize) {{\includegraphics[width=25pt]{nodeNonLin.png}}}; 		
+					\path[yshift=-\nodeSize]         
+					node[hidden neuron] (H1-\nHiddenNodes) at (1*\layersep,-\nHiddenNodes*\nodeSize) {{\includegraphics[width=25pt]{nodeNonLin.png}}};
+					\path[-] (H1-\nHiddenNodesMinusOne) edge (H1-\nHiddenNodes) [dotted];
+					
+					% Draw the second hidden layer nodes     
+					\foreach \name / \y in {1,...,\nHiddenNodesMinusOne}         
+					\path[yshift=0.0cm]             
+					node[hidden neuron] (H2-\name) at (2*\layersep,-\y*\nodeSize) {{\includegraphics[width=25pt]{nodeNonLin.png}}};
+					\path[yshift=-\nodeSize]
+					node[hidden neuron] (H2-\nHiddenNodes) at (2*\layersep,-\nHiddenNodes*\nodeSize){{\includegraphics[width=25pt]{nodeNonLin.png}}}; 	
+					\path[-] (H2-\nHiddenNodesMinusOne) edge (H2-\nHiddenNodes) [dotted]; 
+					
+					% Draw the output layer node     
+					\path[yshift=-\nodeSize]             
+					node[output neuron, pin={[pin edge={black, solid, ->}, black,pin distance={0.8*\nodeSize}]right:${\mathbf{J}\left({\bf y}|\theta\right)}_{1,1}$}] (O-1) at (3*\layersep,-1*\nodeSize) {};
+					\path[yshift=-\nodeSize]             
+					node[output neuron, pin={[pin edge={black, solid, ->}, black,pin distance={0.8*\nodeSize}]right:${\mathbf{J}\left({\bf y}|\theta\right)}_{1,2}$}] (O-2) at (3*\layersep,-2*\nodeSize) {};
+					\path[yshift=-\nodeSize]             
+					node[output neuron, pin={[pin edge={black, solid, ->}, black,pin distance={0.8*\nodeSize}]right:${\mathbf{J}\left({\bf y}|\theta\right)}_{m,n}$}] (O-\nInputNodes) at (3*\layersep,-\nInputNodesPlusOne*\nodeSize) {};
+					\path[-] (O-\nInputNodesMinusOne) edge (O-\nInputNodes) [dotted];
+					
+					%%% Connect N     
+					\foreach \source in {1,...,\nInputNodes}         
+					\foreach \dest in {1,...,\nHiddenNodes}             
+					\path (I-\source) edge (H1-\dest);
+					
+					\foreach \source in {1,...,\nHiddenNodes}         
+					\foreach \dest in {1,...,\nHiddenNodes}             
+					\path (H1-\source) edge (H2-\dest);                
+					
+					\foreach \source in {1,...,\nHiddenNodes}         
+					\foreach \dest in {1,...,\nInputNodes}             
+					\path (H2-\source) edge (O-\dest);
+					
+					\node[annot,above of=H1-1, node distance=2cm] {Hidden Layer 1}; 
+					\node[annot,above of=H2-1, node distance=2cm] {Hidden Layer 2};
+					\node[annot,above of=I-1, node distance=2cm] {Input Layer};
+					\node[annot,above of=O-1, node distance=2cm] {Output Layer}; 
+					
+					\coordinate (Dash-11) at ({0*\layersep+0.8*\nodeSize},0) {};
+					\coordinate (Dash-12) at ({2*\layersep+0.8*\nodeSize},0) {};
+					\coordinate (Dash-13) at ({3*\layersep+0.8*\nodeSize},0) {};
+					
+					\end{tikzpicture} 
+					\par\end{center}%
+			\end{minipage}
+			\par\end{centering}
+		\caption{Suggested \ac{ANN} structure \label{fig:Suggested--structure}}
+	\end{figure}
+	\acp{ANN} also have a few additional advantages over other smooth parametric function families. They are very general and have proven to perform well in a very wide spectrum of application, their construction and optimization is well researched, many methods exist to regularize them making it easier to explicitly and implicitly impose smoothness of the result and finally, due to their extreme popularity there are many software and hardware solutions allowing for efficient and fast optimization of these networks. 
+	
+	\subsection{Hyper-parameter selection}
+		\label{ssec:Hyper-parameter-selection-and}
+		
+	In addition to using smooth non-linearities in order to impose smoothness of the estimated metric, one can also control the estimated function complexity by limiting the number of non-linear nodes in the network and by using a weight decay term which encourages the use of smaller weights in the network, preventing the output function from varying too much with changes in the input \cite{krogh1991simple}. Choosing these network hyper-parameters is an important part of the use of neural networks. Restricting the network too much limits its ability to describe the complexity of the observation function by overly smoothing the metric variation, on the other hand, using a network with too many degree of freedom would cause the estimation to be unrestricted and would lead to and effectively local and non-robust estimator.
+	
+	Since we are working in a unsupervised setting with no ground truth value for the intrinsic metric anywhere on the manifold it is not immediately clear how one can choose these hyper-parameters for the network. We employed two approaches which yielded similar results. 
+	
+	The first is through a validation set, where we set aside a number of measurements which are not used to the training of the network but are used to estimate the true log-likelihood of the learned estimator. An over-fitted or under-constrained model would be able to explain
+	fit itself to the observed data but it will likely not be able to properly explain the validation set due to its high variance. In our tests we used common regular k-fold cross-validation where $20\%$ of the observed samples were used for validation purposes, this was done 20 time for each set of hyper parameters, where the validation set was sampled randomly from the whole data at each iteration.
+	
+	In the following example we sample the data with a \ac{GMM} of $N=500$ cluster with $N_{i}=5$ samples generated from each cluster. Out of the $N$ clusters, $N_{Valid}=100$ clusters are used for validation and $N_{Train}=400$ clusters are used for training. We plot the error graphs of the training set the validation set and the ground truth error, by using the real analytical Jacobians for different net sizes and weight decays, we perform a number of these training and average the results on the validation set. 
+	
+	We wish to choose the optimal number of nodes for each of the two layers of the network, we examine the possibilities of $10,20,50$
+	nodes and also different magnitudes of the weight decay term. The results of training for a number of sets of hyper parameter are presented for the Fishbowl data in \cref{fig:learning_curves}. We see that the validation log-likelihood, when behaves very similarly to the log-likelihood of the the real data. This allows us to use the validation log-likelihood as a way to estimate the true performance
+	
+	\begin{figure}[h]
+		\begin{centering}  
+			\begin{subfigure}[b]{0.28\linewidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_4/validation/n_10_w_0.0002.png}
+				\caption{N=10, w=0.0002}
+			\end{subfigure} \hfill
+			\begin{subfigure}[b]{0.28\linewidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_4/validation/n_10_w_0.00005.png}
+				\caption{N=10, w=0.00005}
+			\end{subfigure} \hfill 
+			\begin{subfigure}[b]{0.28\linewidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_4/validation/n_10_w_0.00001.png}
+				\caption{N=10, w=0.00001}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}  
+			\begin{subfigure}[b]{0.28\linewidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_4/validation/n_20_w_0.0002.png}
+				\caption{N=20, w=0.0002}
+			\end{subfigure} \hfill
+			\begin{subfigure}[b]{0.28\linewidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_4/validation/n_20_w_0.00005.png}
+				\caption{N=20, w=0.00005}
+			\end{subfigure} \hfill 
+			\begin{subfigure}[b]{0.28\linewidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_4/validation/n_20_w_0.00001.png}
+				\caption{N=20, w=0.00001}
+			\end{subfigure}
+		\end{centering}
+		\begin{centering}  
+			\begin{subfigure}[b]{0.28\linewidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_4/validation/n_50_w_0.0007.png}
+				\caption{N=50, w=0.0007}
+			\end{subfigure}\hfill
+			\begin{subfigure}[b]{0.28\linewidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_4/validation/n_50_w_0.0005.png}
+				\caption{N=50, w=0.0005}
+			\end{subfigure} \hfill 
+			\begin{subfigure}[b]{0.28\linewidth}
+				\includegraphics[width=1\textwidth]{figures/Chapter_4/validation/n_50_w_0.0002.png}
+				\caption{N=50, w=0.0002}
+			\end{subfigure}
+		\end{centering}
+		\caption{Learning curves for different hyper-parameters \label{fig:learning_curves} }   
+	\end{figure}	
+	
+	A second method that can be used in this case is choosing the hyper-parameter which result in the final embedding with the minimal observed stress with respect to the estimated distances. If metric estimation are poor, due to noise or over-fitting, it is unlikely that the resulting estimated inter-point distances will allow for an embedding in low-dimensional space . Choosing the hyper-parameter which results in distances which ``fit together'' the best is a good indication that it represents an embedding that is close to the true structure. Since the metric estimations are used for distance estimations which are then used in order to embed the point in a low-dimensional space. Errors in the metric estimation will lead to sets of intrinsic distance that do not fit well in low dimensional space. Intuitively it is reasonable that wrongly estimating the distances and metrics will not by chance lead to distances describing a different possibly low-dimensional conformation. In practice we use different value of regularization and choose the option which results in the lowest normalized stress value with respect to the approximated intrinsic distances.
+	
+	\subsection{Implementation}
+		\label{ssec:Net_implementation}
+		We implemented the described metric estimation network in Python using Theano \cite{bergstra2010theano} for symbolic derivation of the cost term presented in (\cref{eq:Ann-cost}) with respect to the network weights. To facilitate better and faster optimization the stochastic gradient descent method \ac{ADAM} \cite{kingma2014adam} was used. This method uses momentum and moment estimation over time to automatically and adaptability scale the learning rate of the optimization process for faster convergence. The optimal net hyper-parameters were selected by k-fold cross validation as described in Subsection \cref{ssec:Hyper-parameter-selection-and}.
+	

@@ -1,0 +1,127 @@
+% SIAM Shared Information Template
+% This is information that is shared between the main document and any
+% supplement. If no supplement is required, then this information can
+% be included directly in the main document.
+
+
+% Packages and macros go here
+\usepackage{lipsum}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{algorithmic}
+\usepackage[nolist,nohyperlinks]{acronym}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{grffile}
+\usepackage{xr}
+\usepackage{subcaption}
+
+
+\ifpdf
+  \DeclareGraphicsExtensions{.eps,.pdf,.png,.jpg}
+\else
+  \DeclareGraphicsExtensions{.eps}
+\fi
+
+%strongly recommended
+\numberwithin{theorem}{section}
+
+% Declare title and authors, without \thanks
+\newcommand{\TheTitle}{Intrinsic Isometric Manifold Learning with Application to Localization} 
+\newcommand{\TheAuthors}{A. Schwartz and R. Talmon}
+
+% Sets running headers as well as PDF title and authors
+\headers{Intrinsic Isometric Manifold Learning}{\TheAuthors}
+
+% Title. If the supplement option is on, then "Supplementary Material"
+% is automatically inserted before the title.
+\title{{\TheTitle}\thanks{Submitted to the editors DATE.
+\funding{This work was funded by the Fog Research Institute under contract no.~FRI-454.}}}
+
+% Authors: full names plus addresses.
+\author{
+  Ariel Schwartz\thanks{Viterbi Faculty of Electrical Engineering, Technion – Israel Institute of Technology, Israel
+    (\email{ariels@technion.campus.ac.il}}
+  \and
+  Ronen Talmon\thanks{Viterbi Faculty of Electrical Engineering, Technion – Israel Institute of Technology, Israel  (\email{ronen@ee.technion.ac.il}}
+}
+
+\usepackage{amsopn}
+\DeclareMathOperator{\diag}{diag}
+
+
+\newcommand\plotresults	[1]{
+	\begin{figure}[h]	
+	\begin{centering}
+		\begin{subfigure}[b]{0.4\linewidth}
+			\includegraphics[width=1\linewidth]{#1+{/intrinsic}}
+			\captionsetup{justification=centering}
+			\caption{Intrinsic space}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.50\linewidth}
+			\includegraphics[width=1\linewidth]{#1+/observed}
+			\caption{Observed space}
+		\end{subfigure}
+	\end{centering}
+	\begin{centering}
+		\begin{subfigure}[b]{0.45\linewidth}
+			\includegraphics[width=1\linewidth]{#1+/metric_local_dense}
+			\caption{Intrinsic metric}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.45\linewidth}
+			\includegraphics[width=1\linewidth]{#1/dist_local}
+			\caption{Intrinsic distance approximation}
+		\end{subfigure}
+	\end{centering}
+	\begin{centering}
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{#1/standard_isomap_embedding}
+			\captionsetup{justification=centering}
+			\caption{Standard Isomap  \\Embedding}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{#1/embedding_intrinsic_isomap_dense}
+			\captionsetup{justification=centering}
+			\caption{Intrinsic Isomap \\Embedding}	
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{#1/embedding_intrinsic_isometric_dense}
+			\captionsetup{justification=centering}
+			\caption{Intrinsic Isometric \\Embedding}
+		\end{subfigure}
+	\end{centering}
+	\begin{centering}
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{#1/standard_isomap_stress}
+			\captionsetup{justification=centering}
+			\caption{Standard Isomap \\Stress}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{#1/stress_intrinsic_isomap_dense}
+			\captionsetup{justification=centering}
+			\caption{Intrinsic Isomap \\Stress}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{#1/stress_intrinsic_isometric_dense}
+			\captionsetup{justification=centering}
+			\caption{Intrinsic Isometric \\Stress}
+		\end{subfigure}
+	\end{centering}
+	\caption{Punctured fishbowl}
+\end{figure}
+}
+
+
+
+
+%%% Local Variables: 
+%%% mode:latex
+%%% TeX-master: "ex_article"
+%%% End: 

@@ -1,0 +1,210 @@
+\externaldocument{paper.tex}
+
+
+\section{Local metric estimation}
+\label{sec:Local-intrinsic-metric}
+
+We will now present a few settings in which one can approximate the intrinsic metric merely from observed data. All these settings require some assumptions about the structure of the data in the latent intrinsic space which generates the observed data-set. The need for such prior knowledge is not very surprising, since in order to ``look beyond'' the observed manifold and calculate properties of the intrinsic geometry in the latent space, we must somehow estimate what distortion was applied to the manifold by the observation function. A prior assumption about the structure of the latent data serves as a sort of gauge of this distortion and by comparing the observed data structure to the
+assumed latent structure we can, under certain setting, infer the effect of the observation function.
+
+In this section we focus on local methods of metric estimation, these methods operate on small patches of the manifold for which the observation function can be approximated as a linear function using its local Jacobian. The settings discussed below are not in any way unique and one can think of a multitude of scenarios in which priors assumptions about the latent system allow us to estimate the local distortion imposed on data by the unknown observation function.
+
+\subsection{Rigid sensor array}
+\label{ssec:Rigid-sensor-array}
+
+Consider the values of an observation function $f:\mathbb{R}^{n}\to\mathbb{R}^{m}$ observed at $\mathbf{x}+\hat{\mathbf{u}}$. According to the Taylor series approximation:
+\[
+f\left(\mathbf{x}+\hat{\mathbf{u}}\right)=f\left(\mathbf{x}\right)+\frac{df}{dx}\left(\mathbf{x}\right)\hat{\mathbf{u}}+\mathcal{O}\left(\left\Vert \hat{\mathbf{u}}\right\Vert \right)
+\]
+If the difference between the two measurements $\left\Vert \hat{\mathbf{u}}\right\Vert $ is small with respect to the higher derivatives of the function $f$ we get that:
+\[
+f\left(\mathbf{x}+\hat{\mathbf{u}}\right)-f\left(\mathbf{x}\right)\approx\frac{df}{dx}\left(\mathbf{x}\right)\hat{\mathbf{u}}
+\]
+If one observes the function at $k$+1 intrinsic points $\mathbf{x},\mathbf{x}+\hat{\mathbf{u}}_{1},\ldots,\mathbf{x}+\hat{\mathbf{u}}_{k}$
+we get a set of such equations :
+
+\begin{align*}
+	f\left(\mathbf{x}+\hat{\mathbf{u}}_{1}\right)-f\left(\mathbf{x}\right)= & \frac{df}{dx}\left(\mathbf{x}\right)\hat{\mathbf{u}}_{1}\\
+	\vdots\\
+	f\left(\mathbf{x}+\hat{\mathbf{u}}_{\text{k}}\right)-f\left(\mathbf{x}\right)= & \frac{df}{dx}\left(\mathbf{x}\right)\hat{\mathbf{u}}_{k}+\mathbf{w}_{k}
+\end{align*}
+To simplify this we denote:
+\begin{align*}
+	\hat{\mathbf{U}}= & \left[\hat{\mathbf{u}}_{1}|\cdots|\hat{\mathbf{u}}_{k}\right]\\
+	\mathbf{D}= & \left[f\left(\mathbf{x}+\hat{\mathbf{u}}_{1}\right)-f\left(\mathbf{x}\right)|\cdots|f\left(\mathbf{x}+\hat{\mathbf{u}}_{k}\right)-y\left(\mathbf{x}\right)\right]
+\end{align*}
+And get:
+\[
+\mathbf{D}=\frac{df}{dx}\left(\mathbf{x}\right)\hat{\mathbf{U}}
+\]
+
+If the vectors $\hat{\mathbf{u}}_{1},\hat{\mathbf{u}}_{2},\dots,\hat{\mathbf{u}}_{k}$ span the $n$-dimensional intrinsic space (i.e. the matrix $\hat{\mathbf{U}}$ has a full row rank), we can invert this relationship using the pseudo-inverse of $\hat{\mathbf{U}}$ matrix in order to recover the observation function Jacobian by:
+\[
+\mathbf{D}\hat{\mathbf{U}}^{T}\left[\hat{\mathbf{U}}\hat{\mathbf{U}}^{T}\right]^{-1}=\frac{df}{dx}\left(\mathbf{x}\right)
+\]
+This suggests a method for estimating the Jacobian of an unknown observation function, using an array of measurements with a known structure. $\mathbf{M}\left(\mathbf{y}\right)$ can then be estimated by:
+\begin{equation}
+\mathbf{M}\left(\mathbf{y}\right)=\frac{df}{dx}\left(\mathbf{x}\right)\frac{df}{dx}\left(\mathbf{x}\right)^{T}\approx\mathbf{D}\hat{\mathbf{U}}^{T}\left[\hat{\mathbf{U}}\hat{\mathbf{U}}^{T}\right]^{-1}\left[\hat{\mathbf{U}}\hat{\mathbf{U}}^{T}\right]^{-T}\hat{\mathbf{U}}\mathbf{D}\label{eq:array-est}
+\end{equation}
+We notice that if this array is rotated around the point $\mathbf{x}$ with a rotation matrix $\mathbf{R}$ we get a rotation of the estimated Jacobian:
+\begin{align*}
+	\mathbf{D}\left[\mathbf{R}\hat{\mathbf{U}}\right]^{T}\left[\mathbf{R}\hat{\mathbf{U}}\left[\mathbf{R}\hat{\mathbf{U}}\right]^{T}\right]^{-1} & =\mathbf{D}\hat{\mathbf{U}}^{T}\mathbf{R}^{T}\left[\mathbf{R}\hat{\mathbf{U}}\hat{\mathbf{U}}^{T}\mathbf{R}^{T}\right]^{-1}\\
+	& =\mathbf{D}\hat{\mathbf{U}}^{T}\mathbf{R}^{T}\mathbf{R}^{-T}\left[\hat{\mathbf{U}}\hat{\mathbf{U}}^{T}\right]^{-1}\mathbf{R}^{-1}\\
+	& =\mathbf{D}\hat{\mathbf{U}}^{T}\left[\hat{\mathbf{U}}\hat{\mathbf{U}}^{T}\right]^{-1}\mathbf{R}^{-1}\\
+	& =\frac{df}{dx}\left(\mathbf{x}\right)\mathbf{R}^{-1}
+\end{align*}
+However the estimation of $\mathbf{M}\left(\mathbf{y}\right)$ in \cref{eq:array-est} is unaffected by this rotation:
+\begin{equation}
+\frac{df}{dx}\left(\mathbf{x}\right)\mathbf{R}^{-1}\left[\frac{df}{dx}\left(\mathbf{x}\right)\mathbf{R}^{-1}\right]^{T}=\frac{df}{dx}\left(\mathbf{x}\right)\mathbf{R}^{-1}\mathbf{R}^{-T}\cdot\left[\frac{df}{dx}\left(\mathbf{x}\right)\right]=\frac{df}{dx}\left(\mathbf{x}\right)\frac{df}{dx}\left(\mathbf{x}\right)^{T}
+\end{equation}
+This shows that the estimation suggested in (\cref{eq:array-est}) is invariant to a rigid rotation of the measurement directions $\hat{\mathbf{u}}_{1},\ldots,\hat{\mathbf{u}}_{n}$.
+This invariance to a rotation makes this setting practical for intrinsic metric estimation, since one does not have to align the sensor array in any particular way with respect to the intrinsic axis and one can even allow this array to rotate between observations at different points. \cref{fig:Observation-with-a} shows the set of points observed using a sensor array of 3 directions (4 total measurements) for 10 points, where the intrinsic manifold $\mathcal{X}$ is a disk in 2-dimensional Euclidean space.
+
+\begin{figure}[h]
+	\begin{subfigure}[b]{0.48\columnwidth}%
+			\includegraphics[width=1\textwidth]{figures/Chapter_4/sensor_array_example}
+	\end{subfigure}\hfill
+	\begin{subfigure}[b]{0.48\columnwidth}%
+			\includegraphics[width=1\textwidth]{figures/Chapter_4/sensor_array_example_intrinic}
+	\end{subfigure}
+	\caption{Observation with a rigid sensor array Observation for $10$ representative points \label{fig:Observation-with-a}}
+\end{figure}
+
+While observation in $n$ linearly independent directions is sufficient in theory in order to estimate the function Jacobian, observation in more directions will make the estimation more robust in the presence of possible observation noise.
+
+\subsection{Intrinsic isotropic Gaussian mixture model \label{ssec:Intrinsic-isotropic-GMM}}
+
+Assume that the intrinsic data are sampled from an $n$-dimensional \ac{GMM} consisting of $N$ isotropic Gaussian distributions, all with known variance $\sigma_{int}^{2}$, where the means of these distributions are points on the intrinsic manifold which are denoted by $\left\{ \mathbf{x}_{i}\right\} _{i=1}^{N}=\mathcal{X}_{S}=\in\mathcal{X}$. $N_{i}$ points are sampled from the $i$-th Gaussian and we denote these points using a double index:
+\[
+{\bf x}_{i,j}\sim\mathcal{N}\left(\mathbf{x}_{i},\sigma_{int}^{2}I\right)
+\]
+This model is illustrated in \cref{fig:Intrinsic-Gmm-setting}. Sampled points are observed via an observation function $f:\mathbb{R}^{n}\to\mathbb{R}^{m}$ and are distorted by an \ac{AWGN} with variance $\sigma_{obs}^{2}$ introduced in the observation process resulting in observed data points:
+\[
+{\bf y}_{i,j}=f\left({\bf x}_{i,j}\right)+w_{i,j}
+\]
+where $w_{i,j}\sim\mathcal{N}\left(0,\sigma_{obs}^{2}\mathbf{I}\right)$. If the variance $\sigma_{int}^{2}$ of the intrinsic Gaussians is small with respect to the higher-derivatives of the observation function, each Gaussian cluster will only effectively experiences the local linear part of the observation function and one can regard the observed cluster generated by an intrinsic Gaussian as a Gaussian distribution with a transformed covariance and mean:.
+\begin{equation}
+{\bf y}_{i,j}=f\left({\bf x}_{i,j}\right)+w_{i,j}\sim\mathcal{N}\left(f\left(\mathbf{x}_{i}\right),\sigma_{int}^{2}\frac{df}{dx}\left(\mathbf{x}_{i}\right)\frac{df}{dx}\left(\mathbf{x}_{i}\right)^{T}+\sigma_{obs}^{2}\mathbf{I}\right)\label{eq:prob-pca}
+\end{equation}
+We see that the observed data also has the structure of a \ac{GMM} , however, the covariance of the observed Gaussians are anisotropic due to stretching and contraction induced by the observation function Jacobian. The distribution of a single observed Gaussian corresponds to the model presented in the probabilistic \ac{PCA} interpretation \cite{tipping1999probabilistic} where it is shown that the optimal estimator, in the maximum-likelihood sense, of the matrix $\frac{df}{dx}\left(\mathbf{x}_{i}\right)\frac{df}{dx}\left(\mathbf{x}_{i}\right)^{T}$ can be computed by performing \ac{PCA} and finding the $n$ most significant principle directions of the observed sample covariance
+matrix $\mathbf{S}_{i}$:
+\[
+\begin{aligned}{\bf \bar{y}}_{i} & =\frac{1}{N_{i}}\sum_{j=1}^{N_{i}}{\bf y}_{i,j}\\
+\mathbf{S}_{i} & =\frac{1}{N_{i}}\sum_{j=1}^{N_{i}}\left[{\bf y}_{i,j}-{\bf \bar{y}}_{i}\right]\left[{\bf y}_{i,j}-{\bf \bar{y}}_{i}\right]^{T}
+\end{aligned}
+\]
+This matrix can be decomposed using spectral decomposition:
+\[
+\mathbf{S}_{i}=\left[\mathbf{u}_{1}\mathbf{u}_{2}\cdots\mathbf{u}_{n}\cdots\mathbf{u}_{m}\right]\left[\begin{array}{ccccc}
+\sigma_{1}^{2} & 0 & 0 & \ldots & 0\\
+0 & \ddots & 0 & \ldots & \vdots\\
+0 & 0 & \sigma_{n}^{2} & \ldots & 0\\
+\vdots & \vdots & \vdots & \ddots & \vdots\\
+0 & \ldots & 0 & \ldots & \sigma_{m}^{2}
+\end{array}\right]\left[\begin{array}{c}
+\mathbf{u}_{1}^{T}\\
+\mathbf{u}_{2}^{T}\\
+\vdots\\
+\vdots\\
+\mathbf{u}_{n}^{T}\\
+\vdots\\
+\mathbf{u}_{m}^{T}
+\end{array}\right]
+\]
+And the maximum-likelihood estimator is given by \cite{tipping1999probabilistic}:
+\begin{equation}
+\begin{aligned}\frac{df}{dx}\left(\mathbf{x}_{i}\right)\frac{df}{dx}\left(\mathbf{x}_{i}\right)^{T} & \approx\left[\mathbf{u}_{1}\mathbf{u}_{2}\cdots\mathbf{u}_{n}\right]\left[\begin{array}{ccccc}
+\sigma_{1}^{2}-\bar{\sigma^{2}} & 0 & 0 & \ldots & 0\\
+0 & \ddots & 0 & \ldots & \vdots\\
+0 & 0 & \sigma_{n}^{2}-\bar{\sigma^{2}} & \ldots & 0\\
+\vdots & \vdots & \vdots & 0 & \vdots\\
+0 & \ldots & 0 & \ldots & 0
+\end{array}\right]\left[\begin{array}{c}
+\mathbf{u}_{1}^{T}\\
+\mathbf{u}_{2}^{T}\\
+\vdots\\
+\vdots\\
+\mathbf{u}_{n}^{T}
+\end{array}\right]\\
+\bar{\sigma^{2}} & =\frac{1}{m-n}\sum_{k=n+1}^{m}\sigma_{k}^{2}
+\end{aligned}
+\end{equation}
+Assuming that we know the clustering structure of observed measurements (i.e. we know which observation points originate from the same Gaussian)
+we can estimate $\mathbf{M}\left({\bf y}_{i}\right)=\frac{df}{dx}\left(\mathbf{x}_{i}\right)\frac{df}{dx}\left(\mathbf{x}_{i}\right)^{T}$ for each observed Gaussian separately. This setting is similar to the setting presented in \cite{singer2008non} where short bursts of diffusion processes with isotropic diffusion were used, resulting in an approximate intrinsic \ac{GMM} process and leading to the same estimator of the intrinsic metric using local application of \ac{PCA}.
+
+\begin{figure}[h]
+	\begin{centering}
+		\includegraphics[width=0.6\textwidth]{figures/Chapter_4/intrinsic_GMM_model}
+	\end{centering}
+	\caption[Intrinsic \ac{GMM} setting]{Intrinsic \ac{GMM} setting. $10$ representative Gaussians from the mixture model are visualized in the intrinsic space for the case where $\mathcal{X}$ is a disk in 2-dimensional Euclidean space \label{fig:Intrinsic-Gmm-setting}}
+\end{figure}
+
+\subsection{Intrinsic diffusion process\label{ssec:Intrinsic-diffusion-processes}}
+
+Data often originates from observation of a latent dynamical system over time. In such situations, information is not encoded only in the measurement values but also in time at which these measurements were received. Prior knowledge about the statistical model of the latent system combined with this temporal information can be used in order to estimate the intrinsic metric. 
+
+Here we present a setting where a latent system governed by a single continuous diffusion process, as is encountered in many scientific fields, allows one to estimate the local intrinsic metric from the observed measurement process. Consider an $n$-dimensional Itô process governed by the following \ac{SDE} :
+\[
+d\mathbf{x}\left(t\right)=\mu_{int}\left(\mathbf{x}\left(t\right)\right)\cdot dt+\sigma_{int}dB\left(t\right)
+\]
+A scalar observation function $f:\mathbb{R}^{n}\to\mathbb{R}$ is
+applied to this process creating the observation process $f\left(\mathbf{x}\left(t\right)\right)$
+. According to Itô's lemma \cite{karatzas2012brownian} we get that
+the observed process propagates according to the following \ac{SDE}:
+\[
+df\left(\mathbf{x}\left(t\right)\right)=\left(\frac{df}{dx}\left(\mathbf{x}\left(t\right)\right)\mu_{int}\left(\mathbf{x}\left(t\right)\right)+\text{Tr}\left(\frac{d^{2}f}{dx^{2}}\left(\mathbf{x}\left(t\right)\right)\frac{\sigma_{int}^{2}}{2}\right)\right)dt+\sigma_{int}\frac{df}{dx}\left(\mathbf{x}\left(t\right)\right)dB\left(t\right)
+\]
+To simplify this equation we denote:
+\[
+\mathbf{\mu}_{obs}\left(\mathbf{x}\left(t\right)\right)=\frac{df}{dx}\left(\mathbf{x}\left(t\right)\right)\mu_{int}\left(\mathbf{x}\left(t\right)\right)+\text{Tr}\left(\frac{d^{2}f}{dx^{2}}\left(\mathbf{x}\left(t\right)\right)\frac{\sigma_{int}^{2}}{2}\right)
+\]
+And get:
+\[
+df\left(\mathbf{x}\left(t\right)\right)=\mathbf{\mu}_{obs}\left(\mathbf{x}\left(t\right)\right)dt+\sigma_{int}\frac{df}{dx}\left(\mathbf{x}\left(t\right)\right)dB\left(t\right)
+\]
+We can easily consider the case where the observation function is a $m$-dimensional vector function $f:\mathbb{R}^{n}\to\mathbb{R}^{m}$ which leads to a set of such equations for each dimension that can be written in matrix form:
+\[
+df\left(\mathbf{x}\left(t\right)\right)=\mathbf{\mu}_{obs}\left(\mathbf{x}\left(t\right)\right)dt+\sigma_{int}\frac{df}{dx}\left(\mathbf{x}\left(t\right)\right)dB\left(t\right)
+\]
+An observation of such an intrinsic diffusion process is described in \cref{fig:Diffusion-process-observation}.
+\begin{figure}[h]
+	\centering{}\includegraphics[width=1\textwidth]{figures/Chapter_4/diff_set}\caption{Diffusion process observation\label{fig:Diffusion-process-observation}}
+\end{figure}
+Observing this process at equally spaced time-intervals results in a discreet process which can be, according to the Euler–Maruyama schema\cite{kloeden1992numerical}, approximately described by the following discrete stochastic difference equation: 
+\[
+f\left(\mathbf{x}\left[k+1\right]\right)=f\left(\mathbf{x}\left[k\right]\right)+\mathbf{\mu}_{obs}\left(\mathbf{x}\left[k\right]\right)\triangle t+\sigma_{int}\frac{df}{dx}\left(\mathbf{x}\left[k\right]\right)W\left[k\right]\triangle t
+\]
+Where $\triangle t$ is the sampling interval and $W\left[k\right]$
+is a discrete white Gaussian noise process with unit variance. To
+further simplify this we re-denote:
+\begin{align*}
+	\mu_{obs}\left(\mathbf{x}\left[k\right]\right)= & \mathbf{\mu}_{obs}\left(\mathbf{x}\left[k\right]\right)\triangle t\\
+	\sigma_{int}= & \sigma_{int}\triangle t
+\end{align*}
+And get the following difference equation:
+\[
+f\left(\mathbf{x}\left[k+1\right]\right)-f\left(\mathbf{x}\left[k\right]\right)=\mathbf{\mu}_{obs}\left(\mathbf{x}\left[k\right]\right)+\sigma_{int}\frac{df}{dx}\left(\mathbf{x}\left[k\right]\right)W\left[k\right]
+\]
+This states that the difference process of the discretely sampled observation process has an approximately normal distribution with the following distribution:
+\begin{equation}
+f\left(\mathbf{x}\left[k+1\right]\right)-f\left(\mathbf{x}\left[k\right]\right)\sim\mathcal{N}\left(\mathbf{\mu}_{obs}\left(\mathbf{x}\left[k\right]\right),\sigma_{int}^{2}\frac{df}{dx}\left(\mathbf{x}\left[k\right]\right)\frac{df}{dx}\left(\mathbf{x}\left[k\right]\right)^{T}\right)\label{eq:dist_diff}
+\end{equation}
+We can also consider the possibility \ac{AWGN} being introduced in the observation process and get the following equation for the observation process:
+\begin{equation}
+\mathbf{y}\left[k+1\right]-\mathbf{y}\left[k\right]\sim\mathcal{N}\left(\mathbf{\mu}_{obs}\left(\mathbf{x}\left[k\right]\right),\sigma_{int}^{2}\frac{df}{dx}\left(\mathbf{x}\left[k\right]\right)\frac{df}{dx}\left(\mathbf{x}\left[k\right]\right)^{T}+\sigma_{obs}^{2}\mathbf{I}\right)
+\end{equation}
+This indicates that the difference process can be seen as being sampled from a Gaussian distribution whose covariance and drift are location dependent. A straightforward method to estimate $\mathbf{M}\left(\mathbf{y}_{i}\right)$ for a specific observation point $\mathbf{y}_{i}$ is to look for all observation time indexes $k$ for which $\mathbf{y}[k]\approx\mathbf{y}_{i}$ and donate this set by $K_{\mathbf{y_{i}}}$:
+\[
+K_{\mathbf{y_{i}}}=\left\{ k|\mathbf{y}[k]\approx\mathbf{y}_{i}\right\} 
+\]
+
+If the observation function is sufficiently smooth and invertible, observations which are close enough to each other in the observation space originate from similar intrinsic points and therefor experience similar observation function Jacobians. As a result the observed process ``jumps'' $f\left(\mathbf{x}[k+1]\right)-f\left(\mathbf{x}[k]\right)$ for all $k\in K_{\mathbf{y_{i}}}$ will be distributed with very similar Gaussian distributions. \cref{fig:Process-jump-clustering} illustrates how three points from the observed process which are ``close-enough'' to each other in the observation space can be clustered together. The three process ``jumps'' originating from these three points are all approximately distributed with the same distribution. Gathering enough such ``jumps'' from a single location allows us to estimate the covariance matrix and the intrinsic metric again by performing local \ac{PCA} as described in \cref{ssec:Intrinsic-isotropic-GMM} and \cite{tipping1999probabilistic}. 
+
+\begin{figure}[h]
+	\centering{}\includegraphics[width=1\textwidth]{figures/Chapter_4/cluster_for_metric}\caption{Process jump clustering \label{fig:Process-jump-clustering}}
+\end{figure}
+
+This method clusters together vectors of the observed difference process which are almost identically distributed according to (\cref{eq:dist_diff}). If these clusters are disjoint this results in independent Gaussians distributions and leads again to an observed \ac{GMM} as in \cref{ssec:Intrinsic-isotropic-GMM}. However, in general this clusters are not necessarily disjoint and the different Gaussian distributions are not independent of each other, in such cases this estimator can only be regarded as a heuristic approximation of the true maximum-likelihood estimator.
+
+Diffusion processes were used in \cite{singer2008non} in order to expose the intrinsic metric, however they were used in a different setting where multiple burst of intrinsic diffusion processes starting from the same initial state were used, a setting which is less realistic and is applicable mainly for dimensionality reduction of complex non-linear systems which admit simulations as in 
+

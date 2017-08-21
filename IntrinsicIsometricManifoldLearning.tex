@@ -1,0 +1,164 @@
+\externaldocument{paper.tex}
+
+\section{Proposed algorithm - Intrinsic Isometric Manifold Learning}
+	\label{sec:Intrinsic-isometric-manifold-learning}
+
+	
+	\subsection{Algorithm high-level overview}
+	\label{ssec:Algorithm-high-level-overview}
+	
+	First we will describe an Intrinsic Isometric manifold learning algorithm which operates assuming that the values of the matrix $\mathbf{M}\left({\bf y}_{i}\right)=\frac{df}{dx}\left(f^{-1}\left({\bf y}_{i}\right)\right)\frac{df}{dx}\left(f^{-1}\left({\bf y}_{i}\right)\right)^{T}$ are given for all $y_{i}\in{\cal Y}_{s}$, where $\frac{df}{dx}\left(\mathbf{x}\right)$ is the Jacobian of the observation function w.r.t the intrinsic variable at the intrinsic point ${\bf x}_{i}$. Although this is a very restrictive requirement, we show in the \cref{sec:Intrinsic-Metric-Estimation} how it can, in some scenarios, be robustly approximated from the accessible sample subset ${\cal Y}_{s}$ without explicit knowledge of $f$.
+	
+	Our approach then for achieving the goal described is \cref{sec:setting} is implemented by first recognizing that $\mathbf{M}\left({\bf y}_{i}\right)^{\dagger}=\left[\frac{df}{dx}\left(f^{-1}\left({\bf y}_{i}\right)\right)\frac{df}{dx}\left(f^{-1}\left({\bf y}_{i}\right)\right)^{T}\right]^{\dagger}$ is in fact the push-forward metric tensor and the observation function $f$ creates a isomorphism between the intrinsic and observed manifolds when using this push-forward metric as the Riemannian metric on the tangent planes of the observed manifold $\mathcal{Y}$. This isomorphism allows us to calculate approximation of short range intrinsic Euclidean distances on the observed manifold in a way that is invariant to the observation function $f$, as if they were calculated directly on the latent intrinsic manifold $\text{\ensuremath{\mathcal{X}}}$. We then construct an embedding of the observed manifold into $n$-dimensional Euclidean space by performing \ac{LS-MDS} using the approximations of the short-range intrinsic distances as the target distances. Since only short-range distances are approximated, we use a weighted version of the stress function (presented in Equation \cref{eq:w-intrinisc_stress}) which can ``ignore'' un-approximated inter-point distances and call it the \textit{partial stress function}. As this defines a non-convex cost function we are required to provide the optimization process with a good initial solution, to do so we recognize that using intrinsic short-range distances we can calculate approximations of all intrinsic geodesic distances on the manifold. With this we define an intrinsic version of the well known Isomap algorithm \cite{tenenbaum2000global}, which attempts to embed the sampled points in an Euclidean space so that they respect the approximated geodesic distances. The resulting embedding is used as an initial embedding for the minimization of the partial stress function \cref{eq:w-intrinisc_stress}. Due to the low-dimension constraint imposed on the embedding, the minimization of the partial stress function leads also to minimization of the full unweighted stress function in \cref{eq:stress}. The flow of this algorithm is illustrated in \cref{fig:Intrinsic-isometric-manifold-lea}.
+	
+	This approach harnesses the ability of eigen-decomposition to give a globally optimal solution to the embedding problem given all inter-point distances and the ability of the \ac{LS-MDS} optimization approach to only consider local intrinsic Euclidean structure. Convergence of the optimization process is achieved provided that the embedding received via eigen-decomposition is ``close enough'' to the true intrinsic structure. Since, as we will show, this might not be the case for highly non-convex intrinsic manifolds we also devise an iterative multi-scale optimization scheme to avoid such occurrences. 
+	
+	\begin{figure}[h]
+		\begin{centering}
+			\includegraphics[width=1\textwidth]{figures/Chapter_3/flow}
+			\par\end{centering}
+		\caption{Intrinsic-isometric manifold learning flow graph\label{fig:Intrinsic-isometric-manifold-lea}}
+	\end{figure}
+	
+	\subsection{Local intrinsic geometry approximation}
+	\label{ssec:Intrinsic-geometry-approximation}
+	
+	Minimization of the cost function given in \cref{sec:setting} first requires an approximation of the intrinsic Euclidean inter-point distances $d_{i,j}=d_{euc}\left(\text{\ensuremath{\mathbf{x}}}_{i},\text{\ensuremath{\mathbf{x}}}_{j}\right)=\left\Vert {\bf x}_{i}-{\bf x}_{j}\right\Vert $ without having direct access to the latent intrinsic variables themselves. To overcome this obstacle we recognize that ${\cal X}$ can be viewed as a Riemannian manifold by endowing it with the dot-product inherited from its $n$-dimensional intrinsic Euclidean space, and that $\mathbf{M}\left({\bf y}_{i}\right)^{\dagger}=\left[\frac{df}{dx}\left(f^{-1}\left({\bf y}_{i}\right)\right)\frac{df}{dx}\left(f^{-1}\left({\bf y}_{i}\right)\right)^{T}\right]^{\dagger}$ gives us the push-forward metric tensor on $\mathcal{Y}$ with respect to the transformation between $\mathcal{X}$ and $\mathcal{Y}$ (the observation function). With this, an isomorphism is established between the two manifolds $\mathcal{X}$ and $\mathcal{Y}$ which enables
+	us to use $\mathcal{Y}$ as a proxy for making intrinsic geometric calculations on the latent manifold $\mathcal{X}$. A similar observation was made in \cite{singer2008non}, where the following approximation was suggested for calculating intrinsic inter-point distances:
+	\begin{equation}
+		\begin{aligned}
+			\tilde{d}_{i,j}^{2}=&\frac{1}{2}\left[\text{\ensuremath{\mathbf{y}}}_{i}-\mathbf{y}_{j}\right]^{T}\mathbf{M}\left({\bf y}_{i}\right)^{\dagger}\left[\text{\ensuremath{\mathbf{y}}}_{i}-\mathbf{y}_{j}\right]+\frac{1}{2}\left[\text{\ensuremath{\mathbf{y}}}_{i}-\mathbf{y}_{j}\right]^{T}\mathbf{M}\left({\bf y}_{j}\right)^{\dagger}\left[\text{\ensuremath{\mathbf{y}}}_{i}-\mathbf{y}_{j}\right] \\ 
+			\approx & \left\Vert \text{{\bf x}}_{i}-\text{{\bf x}}_{j}\right\Vert^{2} = d_{i,j}^{2}\label{eq:int_dist_approx}
+		\end{aligned}
+	\end{equation}
+	This approximation has been used is several papers \cite{dsilva2013nonlinear,dsilva2015data,dsilva2015parsimonious,duncan2013identifying,mishne2015graph,singer2008non,talmon2012parametrization,talmon2013empirical,talmon2015intrinsic,talmon2015manifold},
+	error analysis for it was presented in \cite{dsilva2015data,singer2008non} and it was found to be:
+	\[
+	d_{i,j}^{2}=\frac{1}{2}\left[\text{\ensuremath{\mathbf{y}}}_{i}-\mathbf{y}_{j}\right]^{T}\mathbf{M}\left({\bf y}_{i}\right)^{\dagger}\left[\text{\ensuremath{\mathbf{y}}}_{i}-\mathbf{y}_{j}\right]+\frac{1}{2}\left[\text{\ensuremath{\mathbf{y}}}_{i}-\mathbf{y}_{j}\right]^{T}\mathbf{M}\left({\bf y}_{j}\right)^{\dagger}\left[\text{\ensuremath{\mathbf{y}}}_{i}-\mathbf{y}_{j}\right]+\ensuremath{\mathcal{O}}\left(\left\Vert \text{\ensuremath{\mathbf{y}}}_{i}-\mathbf{y}_{j}\right\Vert ^{4}\right)
+	\]
+	We show the nature of this approximation on an artificial data set in \cref{ssec:simulated_data_Intrinsic_isometric_embedding}. It is evident from both the empirical results from the given example and the rigorous error analysis given in \cite{dsilva2015data} that this approximation is valid only for points of the observed manifold which are close to each other, i.e. when $\left\Vert\text{\ensuremath{\mathbf{y}}}_{i}-\mathbf{y}_{j}\right\Vert ^{4}$ is small with respect to the higher derivatives of the observation function. In order to generate an embedding from the calculated intrinsic inter-point distance estimations we formulate a \ac{LS-MDS} optimization problem using the weighted version of the stress function :
+	\begin{equation}
+	\sigma\left(\widetilde{\mathbf{X}}\right)=\sum_{i<j}w_{i,j}\left(\left\Vert \mathbf{\widetilde{x}}_{i}-\mathbf{\widetilde{x}}_{j}\right\Vert -\tilde{d_{i,j}}\right)^{2}\label{eq:w-intrinisc_stress}
+	\end{equation}
+	Where unknown (or unreliable) distances estimations are given zero weights. Determining the exact scale at which we can ``trust'' the approximation \cref{eq:int_dist_approx} is still an open issue but this is a common problem in non-linear dimensionality reduction and dealing with this is out of the scope of this work. We will say that use of between 5 and 15 nearest neighbors around each sample point has proven to be a good rule-of-thumb since this gives good graph connectivity while using mostly reliable distance approximations. We remark that in \cite{singer2008non} this approximation was used in order to create an intrinsic variant of the diffusion maps method. There, the locality of the approximation did not pose a problem due to the exponentially decaying diffusion kernel in which it was used, which made longer distances and their approximation errors insignificant. However, in our work, we aim to retrieve the actual Euclidean geometry of the intrinsic space and it is not immediately clear if this locally approximated intrinsic geometry uncovers enough information about the intrinsic manifold in order to fully recover it. The possibility of retrieving the intrinsic structure only given a subset of known inter-point distances can be reduced to the question of whether a not a inter-point \ac{EDM} originating from points known to reside in an $n$-dimensional Euclidean space can be uniquely completed given only a subset of the distances. This problem is known as the \ac{EDMCP} \cite{alfakih1999solving,fang2012euclidean}. It is known that under cretin conditions it is possible to uniquely determine all missing distances from a subset of of distance, this is usually done using semi-definite programming, which makes it untraceable for problems involving large numbers of points (which are the case of interest in most manifold learning application), however this motivates us to believe that given a number of known distance constrains coupled with the requirement that the points lay in a $n$-dimensional Euclidean space might be enough in order to fully constrain the problem allowing for a unique solution which represents the true latent structure.
+	
+	\subsection{Intrinsic geodesic distance approximation and intrinsic Isomap}
+	\label{ssec:Global-geometry-approximation}
+	
+	A problem common with \ac{LS-MDS} it is that due to it being a non-convex optimization problem which convergence to a local (as opposed to global) minima. In order to improve the chances of converging to a good final solution one must provide in with a good initial point. In this case this means a good initial embedding into $n$-dimensional space. This initial embedding is then tweaked during the optimization until complete convergence. In order to construct this initial embedding we create an intrinsic variant of the Isomap algorithm.
+	
+	To do so we harness the ability to calculate local geometry in an intrinsic fashion and use the local distances approximated using \cref{eq:int_dist_approx} in order to approximate all intrinsic geodesic distances directly from the observed manifold. To understand why this is possible we look look at the definition of path lengths:
+	\[
+	L_{\mathcal{X},h}\left[\gamma\right]=L_{\mathcal{Y},f_{*}}\left[f\left(\gamma\right)\right]=\int_{a}^{b}\sqrt{f_{*f\left(\gamma(t)\right)}\left(f\left(\gamma\left(t\right)\right)',f\left(\gamma\left(t\right)\right)'\right)}dt
+	\]	
+	This equation states that all length calculations for corresponding paths on the isometric manifolds $\mathcal{X}$ and $\mathcal{Y}$ will be identical if one uses the push-forward metric as the metric on the observed manifold $\mathcal{Y}$. This gives us a way to calculate intrinsic path lengths using only observed data assuming that $\left(\frac{df}{dx}\left({\bf x}_{i}\right)\frac{df}{dx}\left({\bf x}_{i}\right)^{T}\right)^{\dagger}$is known everywhere on the manifold. The push-forward metric accounts for local stretching or contraction of the manifold due to the observation function and changes the way we measure distances in order to compensate for this. This is similar to the role the transformation Jacobian determinant has when performing a change of variables when calculating integrals or transforming probability density functions. Using these intrinsic curve length calculation one can also calculate geodesic distances as the infimum over all paths in $\mathcal{Y}$ which connect $f\left({\bf x}_{i}\right)$ and $f\left({\bf x}_{j}\right)$ where the push-forward metric is used as a metric on the observed manifold. Since only a final set of points sampled from these manifold is given, this minimization over all contentious paths can be approximated by a minimization between all paths passing through a limited set of sample point. This presents a problem which is equivalent to the shortest-path problem where only distances for which we have proper distance approximations are represented by edges on the graph.
+	
+	Once all intrinsic inter-point geodesic distances are approximated one can use \ac{MDS} to create an $n$-dimensional embedding in which Euclidean distances best respect these distances. This can be seen as an intrinsic variant of the well known Isomap method. The main difference is that instead of assuming local isometry (as is the case in Isomap) we use the push-forward metric instead of the Euclidean metric on the observed manifold in order to explicitly guarantee local isometry. Since geodesic and Euclidean distances are equal to each other for convex spaces, this intrinsic Isomap method gives an intrinsic-isometric embedding for convex intrinsic manifolds as seen in \cref{fig:Intrinsic-isomap-convex}
+	
+	\begin{figure}[h]
+		\begin{centering}
+			\begin{minipage}[b][1\totalheight][c]{0.3\columnwidth}%
+				\begin{center}
+					\includegraphics[width=1\textwidth]{figures/Chapter_3/convex/intrinsic}
+					\par\end{center}%
+			\end{minipage}\hfill{}%
+			\begin{minipage}[b][1\totalheight][c]{0.3\columnwidth}%
+				\begin{center}
+					\includegraphics[width=1\textwidth]{figures/Chapter_3/convex/observed}
+					\par\end{center}%
+			\end{minipage}\hfill{}%
+			\begin{minipage}[b][1\totalheight][c]{0.3\columnwidth}%
+				\begin{center}
+					\includegraphics[width=1\textwidth]{figures/Chapter_3/convex/embeddingpng}
+					\par\end{center}%
+			\end{minipage}
+			\par\end{centering}
+		
+			\begin{centering}
+				\begin{minipage}[b]{0.3\columnwidth}%
+					\begin{center}
+						\includegraphics[width=1\textwidth]{figures/Chapter_3/non_convex/intrinsic}
+						\par\end{center}%
+				\end{minipage}\hfill{}%
+				\begin{minipage}[b]{0.3\columnwidth}%
+					\begin{center}
+						\includegraphics[width=1\textwidth]{figures/Chapter_3/non_convex/observed}
+						\par\end{center}%
+				\end{minipage}\hfill{}%
+				\begin{minipage}[b]{0.3\columnwidth}%
+					\begin{center}
+						\includegraphics[width=1\textwidth]{figures/Chapter_3/non_convex/embedding}
+						\par\end{center}%
+				\end{minipage}
+				\par\end{centering}
+		\caption{Intrinsic Isomap applied to a convex manifold\label{fig:Intrinsic-isomap-convex}}
+	\end{figure}
+	
+	However this is not true in general and as was discussed in \cite{rosman2010nonlinear} for non-convex manifolds, Euclidean and geodesic distances are not the same and the embedding produced will not respect the intrinsic Euclidean geometry. Indeed on a non-convex data set we see that this method does not recover the structure of the intrinsic space as seen in \cref{fig:punctured_severed_sphere_intrinsic_isomap_embedding}. This shows that simply making the Isomap algorithm intrinsic does not suffice in order to produce an intrinsic-isometric embedding in general however resulting embedding might be ``close-enough'' to an embedding which minimizes the stress function in \cref{eq:w-intrinisc_stress} so that further optimization will converge to a good local minima resulting in an embedding which is intrinsic and isometric.
+	
+	With this strategy we use a combined approach. Using the embedding generated by our intrinsic variant of Isomap as a initial point for the optimization gives us the advantage of the global optimality of a similar embedding problems, then further optimization of the desired cost function lead to a convergence to a local minima of our exact	problem.This combines the benefits of both eigen-decomposition and non-convex optimization.Eigenvalue decomposition provides a globally optimal embedding given a full inter-point distance matrix however the bedimming generated might be distorted due to to non-convexity of the intrinsic manifold, on the other hand non-convex optimization of the stress function is not effected by non convexity however it will not converge to a good local minimum unless it has a good initial embedding. 
+	
+	\subsection{Stress minimization and final embedding}
+	\label{ssec:Embedding-correction-for}
+	
+	Once an initial embedding is built using our intrinsic variant of the Isomap method, further minimization of stress function is performed iteratively with \ac{SMACOF}.
+	
+	It is important to remark that our initial goal, as detailed in \cref{sec:setting}, was to minimize the full, unweighted stress function with respect to the true intrinsic Euclidean distances. Instead we then minimize a weighted stress function where only short intrinsic distances (which we were able to approximate from the observed data) appear. This is similar to common setting in machine learning where a partially known and approximated cost function is minimized with the hope that the true cost function, corresponding in our case to the full and exact stress, in also minimized. It seem that we might suffer from over-fitting if the problem is not constrained enough by the existing distance and low-rank restrictions on the embedding. To see if this is the case we plot the observed partial stress function along the full true stress function. As can be seen in \cref{fig:Stress-Plot-Full} both these function exhibit similar behaviors during the optimization process.
+	\begin{figure}[h]
+		\begin{centering}
+			\includegraphics[width=0.7\textwidth]{figures/Chapter_3/stress_real_vs_observed}
+			\par\end{centering}
+		\caption{Observed partial stress and true full stress during \ac{LS-MDS} optimization\label{fig:Stress-Plot-Full}}
+	\end{figure}
+	At first it might seem surprising that the real stress is lower then the observed stress estimated intrinsic Euclidean distances. To explain this we remember that the intrinsic distance estimations used for the cost function are only noisy approximation of the true intrinsic distances and as such might disagree with each other and might not necessarily be exactly embeddable into a low-dimensional space. As a result a certain amount of stress will exist in the embedding with respect to the noisy distance approximations. The \ac{LS-MDS} process aggregates these noisy intrinsic distance estimations into a single embedding, this has a denoising effect which reduces the stress of the final embedding with respect to the true distances.
+	
+	\subsection{Multi-scale scheme}
+	
+	When the non-convexity of the intrinsic manifold is not very significant, the initial embedding received using our intrinsic variant of the Isomap method (described in \cref{ssec:Global-geometry-approximation}) is, in many cases, close enough to the actual embedding as to allow convergence of the weighted \ac{LS-MDS} minimization to a good solution as described in \cref{ssec:Embedding-correction-for}. However, when the non-convexity of the intrinsic manifold i significant, this initial embedding might not be close enough to the actual intrinsic structure and the \ac{LS-MDS} optimization will not converge to a quality local minimum. To avoid this situation we suggest a multi-scale optimization scheme.
+	
+	We start from a small scale on the observed manifold, applying this method to small patches of the manifold which are convex or approximately-convex, thus improving the chance of the \ac{LS-MDS} optimization to converge to a good solution. Assuming that the algorithm works properly on such a small scale and a good embedding into Euclidean space is received, a straightforward calculation of approximate intrinsic Euclidean distances from the embedding itself is possible and we approximate all inter-point distances in this patch via simple Euclidean distance measurement in the received embedding. This provides an approximation for the previously unknown or missing distances. This approximation does not relay on convexity of the intrinsic manifold and avoids the distortions induced by non-convexity when these distances were previously approximated using shortest-path algorithm. With intrinsic distances now approximated on a larger scale than before we can now increase the scale on which the algorithm operates, again allowing for the introduction of some additional slight non-convexity. At the subsequent iterations of the algorithm, the scale is increased iteratively and the non-convexity induces by the new points is again tackled in the same way. This process is repeated until an embedding of all points into Euclidean space is attained which respect the Euclidean intrinsic distance. The definition of operation scales and their increment can be easily done using the intrinsic geodesic distances which were already approximated as described in \cref{ssec:Global-geometry-approximation}. This gradual increase in scale is visualized in \cref{fig:Increasing-operation-scales}. We remark that although the visualization is in the intrinsic space, the estimation of the geodesic distances and hence the scale selection is performed directly on the observed manifold.
+	
+	\begin{figure}[h]
+		\begin{minipage}[t]{0.19\columnwidth}%
+			\begin{center}
+				\includegraphics[width=1\textwidth]{figures/Chapter_3/scale_1}
+				\par\end{center}%
+		\end{minipage}\hfill{}%
+		\begin{minipage}[t]{0.19\columnwidth}%
+			\begin{center}
+				\includegraphics[width=1\textwidth]{figures/Chapter_3/scale_2}
+				\par\end{center}%
+		\end{minipage}\hfill{}%
+		\begin{minipage}[t]{0.19\columnwidth}%
+			\begin{center}
+				\includegraphics[width=1\textwidth]{figures/Chapter_3/scale_3}
+				\par\end{center}%
+		\end{minipage}\hfill{}%
+		\begin{minipage}[t]{0.19\columnwidth}%
+			\begin{center}
+				\includegraphics[width=1\textwidth]{figures/Chapter_3/scale_4}
+				\par\end{center}%
+		\end{minipage}\hfill{}%
+		\begin{minipage}[t]{0.19\columnwidth}%
+			\begin{center}
+				\includegraphics[width=1\textwidth]{figures/Chapter_3/scale_5}
+				\par\end{center}%
+		\end{minipage}
+		
+		\caption[Increasing operation scales]{Increasing operation scales - 200 points are operated on on the first
+			scale and an additional 200 points are added at each scale \label{fig:Increasing-operation-scales}}
+	\end{figure}
+	
+	A pitfall that might occur in this process is that the increase of the scale of the algorithm is too large resulting in introduction of major non-convexity and poor distance estimation, luckily we can monitor the process of scale increase by calculating the observed partial stress of the generated embedding with respect to the approximated short-intrinsic distances and different scales can be attempted till a good stress value is reached.
+	
+	Another way in which this process can be made more robust is by starting this multi-scale schema form multiple different starting points and then choosing the embedding which results in the least amount of partial observed stress. The selection of stating point can be done by randomly selecting sample points or preferably by clustering the data using the already approximated inter-point intrinsic geodesic distances, which leads to starting points that are distributed across the manifold and can lead to different final results.
+	
+	\begin{figure}[h]
+		\begin{centering}
+			\includegraphics[width=0.7\textwidth]{figures/Chapter_3/center_point_clustering}
+			\par\end{centering}
+		\caption[Clustering and starting point selection]{Clustering and starting point selection using approximated intrinsic
+			geodesic distances. Different colors represent different clusters.
+			The bigger red points represent the cluster centers and will be used
+			as different starting points of the multi-scale schema\label{fig:Clustering-by-geodesic}}
+	\end{figure}

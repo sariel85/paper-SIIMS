@@ -1,0 +1,171 @@
+\documentclass[final,supplement]{siamart1116}
+\input{ex_shared}
+\externaldocument{ex_article}
+% Optional PDF information
+\ifpdf
+\hypersetup{
+  pdftitle={Supplementary Materials: \TheTitle},
+  pdfauthor={\TheAuthors}
+}
+\fi
+\begin{document}
+
+\maketitle
+
+\section{Additional results}
+\label{sec:Additional-results}
+\subsection{Simulated data}
+\subsubsection{Manifold learning}
+\label{ssec:Additional-results-manifold-learning}
+
+\begin{figure}[h]	
+	\begin{centering}
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_severed_sphere/intrinsic}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic1}}
+		\end{subfigure}\hfill
+		\begin{subfigure}[b]{0.30\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_severed_sphere/observed}
+			\caption{\label{fig:punctured_severed_sphere_observed1}}
+		\end{subfigure}\hfill
+		\begin{subfigure}[b]{0.30\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_severed_sphere/metric_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_metric1}}
+		\end{subfigure}
+	\end{centering}
+	\begin{centering}
+		\begin{subfigure}[b]{0.45\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_severed_sphere/dist_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_dist_est1}}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.45\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_severed_sphere/dist_local_dense_knn}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_dist_est_knn1}}
+		\end{subfigure}
+	\end{centering}
+	\begin{centering}
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_severed_sphere/standard_isomap_embedding}
+			\caption{\label{fig:punctured_severed_sphere_standard_isomap_embedding1}}
+		\end{subfigure} \hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_severed_sphere/embedding_intrinsic_isomap_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_isomap_embedding1}}
+		\end{subfigure} \hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_severed_sphere/embedding_intrinsic_isometric_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_isometric_embedding1}}
+		\end{subfigure}
+	\end{centering}
+	\begin{centering}
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_severed_sphere/standard_isomap_stress}
+			\caption{\label{fig:punctured_severed_sphere_standard_isomap_stress1}}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_severed_sphere/stress_intrinsic_isomap_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_isomap_stress1}}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_severed_sphere/stress_intrinsic_isometric_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_isometric_stress1}}
+		\end{subfigure}
+	\end{centering}
+	\caption{\label{fig:punctured_severed_sphere1} S-curve. \protect\subref{fig:punctured_severed_sphere_intrinsic1} Intrinsic space. 
+		\protect\subref{fig:punctured_severed_sphere_observed1} Observed space. 
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_metric1} Intrinsic metric. 
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_dist_est1} Intrinsic distance approximation.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_dist_est_knn1} Intrinsic distance approximation - Knn only.
+		\protect\subref{fig:punctured_severed_sphere_standard_isomap_embedding1} Standard Isomap Embedding.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isomap_embedding1} Intrinsic Isomap Embedding.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isometric_embedding1} Intrinsic Isometric Embedding.
+		\protect\subref{fig:punctured_severed_sphere_standard_isomap_stress1} Standard Isomap Stress.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isomap_stress1} Intrinsic Isomap Stress.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isometric_stress1} Intrinsic Isometric Stress.
+	}
+\end{figure}
+
+\begin{figure}[h]	
+	\begin{centering}
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_twin_peaks/intrinsic}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic2}}
+		\end{subfigure}\hfill
+		\begin{subfigure}[b]{0.30\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_twin_peaks/observed}
+			\caption{\label{fig:punctured_severed_sphere_observed2}}
+		\end{subfigure}\hfill
+		\begin{subfigure}[b]{0.30\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_twin_peaks/metric_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_metric2}}
+		\end{subfigure}
+	\end{centering}
+	\begin{centering}
+		\begin{subfigure}[b]{0.45\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_twin_peaks/dist_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_dist_est2}}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.45\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_twin_peaks/dist_local_dense_knn}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_dist_est_knn2}}
+		\end{subfigure}
+	\end{centering}
+	\begin{centering}
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_twin_peaks/standard_isomap_embedding}
+			\caption{\label{fig:punctured_severed_sphere_standard_isomap_embedding2}}
+		\end{subfigure} \hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_twin_peaks/embedding_intrinsic_isomap_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_isomap_embedding2}}
+		\end{subfigure} \hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_twin_peaks/embedding_intrinsic_isometric_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_isometric_embedding2}}
+		\end{subfigure}
+	\end{centering}
+	\begin{centering}
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_twin_peaks/standard_isomap_stress}
+			\caption{\label{fig:punctured_severed_sphere_standard_isomap_stress2}}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_twin_peaks/stress_intrinsic_isomap_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_isomap_stress2}}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.32\linewidth}
+			\includegraphics[width=1\linewidth]{figures/Chapter_3/2d_square_twin_peaks/stress_intrinsic_isometric_local_dense}
+			\caption{\label{fig:punctured_severed_sphere_intrinsic_isometric_stress2}}
+		\end{subfigure}
+	\end{centering}
+	\caption{\label{fig:punctured_severed_sphere2} Twin peaks. \protect\subref{fig:punctured_severed_sphere_intrinsic2} Intrinsic space. 
+		\protect\subref{fig:punctured_severed_sphere_observed2} Observed space. 
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_metric2} Intrinsic metric. 
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_dist_est2} Intrinsic distance approximation.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_dist_est_knn2} Intrinsic distance approximation - $k$-NN only.
+		\protect\subref{fig:punctured_severed_sphere_standard_isomap_embedding2} Standard Isomap Embedding.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isomap_embedding2} Intrinsic Isomap Embedding.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isometric_embedding2} Intrinsic Isometric Embedding.
+		\protect\subref{fig:punctured_severed_sphere_standard_isomap_stress2} Standard Isomap Stress.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isomap_stress2} Intrinsic Isomap Stress.
+		\protect\subref{fig:punctured_severed_sphere_intrinsic_isometric_stress2} Intrinsic Isometric Stress.
+	}
+\end{figure}
+
+\subsubsection{Metric estimation}
+\label{ssec:Additional-results-Metric estimation}
+
+\subsection{Localization in sensor networks}
+\label{ssec:additional-results-localization}
+
+\bibliographystyle{siamplain}
+\bibliography{references}
+
+
+\end{document}
